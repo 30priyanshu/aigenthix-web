@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create a new blog post - AiGENThix CMS">
+    <title>New Blog - AiGENThix CMS</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="page-content">
+        <!-- Back Link -->
+        <a href="dashboard.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Back to Dashboard</span>
+        </a>
+
+        <!-- Page Header -->
+        <h1 class="page-title">Create New Blog Post</h1>
+        <p class="page-subtitle">Fill in the details to create a new blog post</p>
+
+        <!-- Error Alert -->
+        <div id="error-alert" class="alert alert-error hidden"></div>
+
+        <!-- Blog Form -->
+        <form id="blog-form">
+            <!-- Basic Info Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Basic Information</h2>
+
+                <div class="form-group">
+                    <label class="form-label" for="title">Title *</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Enter blog title"
+                        required maxlength="200">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="slug">Slug</label>
+                        <input type="text" id="slug" name="slug" class="form-input"
+                            placeholder="auto-generated-from-title" maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category</label>
+                        <input type="text" id="category" name="category" class="form-input"
+                            placeholder="e.g., Technology, Business" maxlength="100">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="excerpt">Excerpt</label>
+                    <textarea id="excerpt" name="excerpt" class="form-input form-textarea"
+                        placeholder="Brief summary of the blog post" rows="3" maxlength="300"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="tags">Tags (comma separated)</label>
+                    <input type="text" id="tags" name="tags" class="form-input" placeholder="e.g., tech, ai, web" maxlength="200">
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Content</h2>
+
+                <div class="form-group">
+                    <label class="form-label" for="content">Content * (Markdown supported)</label>
+                    <textarea id="content" name="content" class="form-input form-textarea"
+                        placeholder="Write your blog content here..." rows="12" required></textarea>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Media</h2>
+
+                <div class="form-group">
+                    <label class="form-label" for="featured_image_url">Featured Image URL</label>
+                    <input type="url" id="featured_image_url" name="featured_image_url" class="form-input"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+
+            <!-- Author Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Author Information</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="author_name">Author Name</label>
+                        <input type="text" id="author_name" name="author_name" class="form-input"
+                            placeholder="John Doe" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="author_avatar_url">Author Avatar URL</label>
+                        <input type="url" id="author_avatar_url" name="author_avatar_url" class="form-input"
+                            placeholder="https://example.com/avatar.jpg">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="author_bio">Author Bio</label>
+                    <textarea id="author_bio" name="author_bio" class="form-input form-textarea"
+                        placeholder="Brief author biography" rows="3" maxlength="500"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="author_twitter">Twitter</label>
+                        <input type="text" id="author_twitter" name="author_twitter" class="form-input"
+                            placeholder="@username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="author_linkedin">LinkedIn</label>
+                        <input type="text" id="author_linkedin" name="author_linkedin" class="form-input"
+                            placeholder="linkedin.com/in/username">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="author_github">GitHub</label>
+                        <input type="text" id="author_github" name="author_github" class="form-input"
+                            placeholder="github.com/username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="author_website">Website</label>
+                        <input type="url" id="author_website" name="author_website" class="form-input"
+                            placeholder="https://example.com">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Call to Action</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="cta_text">CTA Text</label>
+                        <input type="text" id="cta_text" name="cta_text" class="form-input" placeholder="Learn More" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cta_url">CTA URL</label>
+                        <input type="url" id="cta_url" name="cta_url" class="form-input"
+                            placeholder="https://example.com/action">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="cta_style">CTA Style</label>
+                        <select id="cta_style" name="cta_style" class="form-input form-select">
+                            <option value="primary">Primary</option>
+                            <option value="secondary">Secondary</option>
+                            <option value="outline">Outline</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cta_position">CTA Position</label>
+                        <select id="cta_position" name="cta_position" class="form-input form-select">
+                            <option value="bottom">Bottom</option>
+                            <option value="top">Top</option>
+                            <option value="both">Both</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="form-section">
+                <h2 class="form-section-title">Settings</h2>
+
+                <div class="form-row">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="published" name="published">
+                        <label for="published">Publish immediately</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="is_featured" name="is_featured">
+                        <label for="is_featured">Mark as featured</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex gap-md" style="margin-top: 2rem;">
+                <button type="submit" id="submit-btn" class="btn btn-success btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    <span>Create Blog Post</span>
+                </button>
+                <a href="dashboard.html" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/env.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/blog-form.js"></script>
+</body>
+
+</html>

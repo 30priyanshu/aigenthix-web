@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /reset-password
+Disallow: /my-account
+
+Sitemap: https://aigenthix.com/sitemap.xml

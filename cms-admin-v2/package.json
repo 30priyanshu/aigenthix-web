@@ -1,0 +1,10 @@
+{
+  "name": "cms-admin-v2",
+  "version": "2.0.0",
+  "private": true,
+  "description": "AiGENThix CMS Admin - Static HTML/CSS/JS",
+  "scripts": {
+    "start": "npx serve . -l 3000",
+    "dev": "npx serve . -l 3000"
+  }
+}

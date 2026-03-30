@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AiGENThix CMS Dashboard - Manage your blogs">
+    <title>Dashboard - AiGENThix CMS</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Loading State -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="spinner"></div>
+        <p>Loading blogs...</p>
+    </div>
+
+    <!-- Main Content (hidden until loaded) -->
+    <div id="main-content" class="hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1 class="header-title">Blog Dashboard</h1>
+                    <p class="header-subtitle">Welcome, <span id="user-name">Admin</span></p>
+                </div>
+                <div class="flex items-center gap-sm">
+                    <!-- Refresh Button -->
+                    <button id="refresh-btn" class="btn btn-icon btn-ghost" title="Refresh">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 2v6h-6" />
+                            <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                            <path d="M3 22v-6h6" />
+                            <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                        </svg>
+                    </button>
+                    <!-- New Blog Button -->
+                    <a href="blog-new.html" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span>New Blog</span>
+                    </a>
+                    <!-- Logout Button -->
+                    <button id="logout-btn" class="btn btn-icon btn-ghost text-red" title="Logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+            <!-- Stats Cards -->
+            <div id="stats-container" class="grid grid-4 gap-md" style="margin-bottom: 2rem;">
+                <div class="stat-card blue">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <div>
+                        <p class="value" id="stat-total">0</p>
+                        <p class="label">Total</p>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    <div>
+                        <p class="value" id="stat-published">0</p>
+                        <p class="label">Published</p>
+                    </div>
+                </div>
+                <div class="stat-card yellow">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <div>
+                        <p class="value" id="stat-draft">0</p>
+                        <p class="label">Drafts</p>
+                    </div>
+                </div>
+                <div class="stat-card purple">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                        <polyline points="17 6 23 6 23 12" />
+                    </svg>
+                    <div>
+                        <p class="value" id="stat-featured">0</p>
+                        <p class="label">Featured</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="flex gap-md" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <!-- Search -->
+                <div class="search-bar" style="flex: 1; min-width: 250px;">
+                    <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search blogs by title, category, or author...">
+                    <button id="clear-search" class="clear-btn hidden">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- Filters -->
+                <div class="filter-tabs">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    </svg>
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="published">Published</button>
+                    <button class="filter-tab" data-filter="draft">Draft</button>
+                    <button class="filter-tab" data-filter="featured">Featured</button>
+                </div>
+            </div>
+
+            <!-- Bulk Actions Bar (hidden by default) -->
+            <div id="bulk-actions" class="bulk-actions hidden">
+                <span class="selected-count"><span id="selected-count">0</span> blog(s) selected</span>
+                <div class="spacer"></div>
+                <button id="bulk-publish" class="btn btn-success"
+                    style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">Publish</button>
+                <button id="bulk-unpublish" class="btn btn-warning"
+                    style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">Unpublish</button>
+                <button id="bulk-delete" class="btn btn-danger"
+                    style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">Delete</button>
+                <button id="bulk-cancel" class="btn btn-ghost"
+                    style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">Cancel</button>
+            </div>
+
+            <!-- Blog List -->
+            <div id="blog-list" class="blog-list"></div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10 9 9 9 8 9" />
+                </svg>
+                <h3 id="empty-title">No blogs yet</h3>
+                <p id="empty-subtitle">Create your first blog post to get started</p>
+                <a id="empty-cta" href="blog-new.html" class="btn btn-primary">Create First Blog</a>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="empty-state hidden">
+                <svg class="icon text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <h3 class="text-red">Failed to load blogs</h3>
+                <p id="error-message">Something went wrong</p>
+                <button id="retry-btn" class="btn btn-primary">Retry</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="modal-backdrop hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="flex items-center gap-md">
+                    <h2 class="text-lg font-semibold">Blog Preview</h2>
+                    <span id="preview-status" class="badge badge-green">Published</span>
+                </div>
+                <button id="close-preview" class="btn btn-icon btn-ghost">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="preview-image" class="preview-image" src="" alt="">
+                <div class="preview-content">
+                    <div class="preview-meta">
+                        <span id="preview-category" class="badge badge-blue"></span>
+                        <span id="preview-date"></span>
+                        <span id="preview-read-time"></span>
+                    </div>
+                    <h1 id="preview-title" class="preview-title"></h1>
+                    <p id="preview-author" class="preview-author"></p>
+                    <p id="preview-excerpt" class="preview-excerpt"></p>
+                    <div id="preview-tags" class="preview-tags"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p class="text-sm text-muted">Slug: <code id="preview-slug"
+                        style="background: var(--color-bg-tertiary); padding: 2px 6px; border-radius: 4px;"></code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/env.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

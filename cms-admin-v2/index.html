@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AiGENThix CMS Admin - Blog Management System">
+    <title>AiGENThix CMS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script>
+        // Redirect to login or dashboard based on auth state
+        (function () {
+            var token = localStorage.getItem('cms_auth_token');
+            if (token) {
+                window.location.replace('dashboard.html');
+            } else {
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="loading-screen">
+        <div class="spinner"></div>
+        <p>Redirecting...</p>
+    </div>
+</body>
+
+</html>
