@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import SEO from "../SEO";
@@ -9,6 +9,8 @@ import aiMlImg from "../IMAGES/Learning And Development images/AIML.webp";
 import generativeAiImg from "../IMAGES/Learning And Development images/GenerativeAi.webp";
 import mlopsImg from "../IMAGES/Learning And Development images/MLOps.webp";
 import agenticAiImg from "../IMAGES/Learning And Development images/AgenticAi.webp";
+import agenticAiSyllabusPdf from "../learning-and-development/Syllabus-pdf/Agentic_AI_Syllabus.pdf";
+import SyllabusModal from "../learning-and-development/SyllabusModal";
 
 /* =========================================================
    GLOBAL IMAGE STYLE (SAME SIZE EVERYWHERE)
@@ -112,6 +114,8 @@ const sectors = [
    MAIN COMPONENT
    ========================================================= */
 const Learning = () => {
+  const [openModal, setOpenModal] = useState(false);
+
   return (
     <>
       <SEO
@@ -181,13 +185,22 @@ const Learning = () => {
                 </p>
 
 
-                <div className="flex gap-4 flex-wrap">
+                <div className="flex gap-4 flex-wrap items-center">
                   <Link
                     to={`/learning-and-development/${sector.slug}`}
                     className="text-blue-600 font-semibold hover:underline"
                   >
                     {sector.slug === "agentic-ai" ? "Enroll Now →" : "Explore Program →"}
                   </Link>
+                  {sector.slug === "agentic-ai" && (
+                    <button
+                      onClick={() => setOpenModal(true)}
+                      className="text-gray-700 hover:text-blue-600 font-semibold transition flex items-center gap-1"
+                    >
+                      <span>Download Syllabus</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -212,6 +225,12 @@ const Learning = () => {
           </Link>
         </section>
       </div>
+
+      <SyllabusModal 
+        isOpen={openModal} 
+        onClose={() => setOpenModal(false)} 
+        pdfSrc={agenticAiSyllabusPdf} 
+      />
     </>
   );
 };

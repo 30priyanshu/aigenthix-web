@@ -5,6 +5,7 @@ import SEO from "../SEO";
 import agenticAiImg from "../IMAGES/Learning And Development images/AgenticAi.webp";
 import { contactService } from "../../services/contactService";
 import agenticAiSyllabusPdf from "./Syllabus-pdf/Agentic_AI_Syllabus.pdf";
+import SyllabusModal from "./SyllabusModal";
 
 const IMAGE_CLASS =
   "w-full h-[260px] md:h-[320px] object-cover rounded-xl shadow-lg";
@@ -305,70 +306,11 @@ const AgenticAI = () => {
         </section>
       </div>
 
-      <AnimatePresence>
-        {openModal && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpenModal(false)}
-            />
-
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 flex items-center justify-center z-50 px-4 py-8"
-            >
-              <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-5xl w-full h-full max-h-[90vh] flex flex-col relative text-center">
-
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-2xl font-bold text-blue-600">
-                    Agentic AI Syllabus
-                  </h3>
-                  <button
-                    onClick={() => setOpenModal(false)}
-                    className="text-gray-500 hover:text-gray-800 transition"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-hidden rounded-lg border border-gray-200 mb-6 bg-gray-100">
-                  <iframe 
-                    src={agenticAiSyllabusPdf} 
-                    title="Agentic AI Syllabus" 
-                    className="w-full h-full"
-                  />
-                </div>
-
-                <div className="flex justify-center gap-4">
-                  <a
-                    href={agenticAiSyllabusPdf}
-                    download="Agentic_AI_Syllabus.pdf"
-                    className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-                  >
-                    Download PDF
-                  </a>
-                  <button
-                    onClick={() => setOpenModal(false)}
-                    className="px-8 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-100 transition"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-
+      <SyllabusModal 
+        isOpen={openModal} 
+        onClose={() => setOpenModal(false)} 
+        pdfSrc={agenticAiSyllabusPdf} 
+      />
 
     </>
   );
