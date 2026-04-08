@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { contactService } from "../../services/contactService";
 
-const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
-  const [showForm, setShowForm] = useState(false);
+const SyllabusModal = ({ isOpen, onClose, pdfSrc, initialMode = "download" }) => {
+  const [viewMode, setViewMode] = useState(initialMode === "enroll" ? "enroll" : "download_form");
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', companyEmail: '', companyName: '',
     jobTitle: '', phoneNumber: '', country: '', comments: '', agreeToTerms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialMode === "enroll") {
+        setViewMode("enroll");
+      } else {
+        setViewMode("download_form");
+      }
+      setSubmitStatus(null);
+      setFormData({
+        firstName: '', lastName: '', companyEmail: '', companyName: '',
+        jobTitle: '', phoneNumber: '', country: '', comments: '', agreeToTerms: false,
+      });
+    }
+  }, [isOpen, initialMode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,17 +35,21 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
       await contactService.submitContactForm(formData);
       setSubmitStatus('success');
 
-      // Trigger download
-      const link = document.createElement('a');
-      link.href = pdfSrc;
-      link.download = "Agentic_AI_Syllabus.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setTimeout(() => {
-        handleClose();
-      }, 3000);
+      if (viewMode === "download_form") {
+        setTimeout(() => {
+          setViewMode("pdf_view");
+          const link = document.createElement('a');
+          link.href = pdfSrc;
+          link.download = "Agentic_AI_Syllabus.pdf";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, 1500); // Show success message briefly before opening PDF and downloading
+      } else {
+        setTimeout(() => {
+          handleClose();
+        }, 3000);
+      }
     } catch (error) {
       console.error("Submission error:", error);
       setSubmitStatus('error');
@@ -48,12 +67,7 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
   };
 
   const handleClose = () => {
-    setShowForm(false);
     setSubmitStatus(null);
-    setFormData({
-      firstName: '', lastName: '', companyEmail: '', companyName: '',
-      jobTitle: '', phoneNumber: '', country: '', comments: '', agreeToTerms: false,
-    });
     onClose();
   };
 
@@ -84,7 +98,7 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
 
-              {!showForm ? (
+              {viewMode === "pdf_view" ? (
                 <div className="flex flex-col h-full p-6">
                   <div className="mb-4 pr-8 shrink-0">
                     <h3 className="text-2xl font-bold text-blue-600">
@@ -99,12 +113,13 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
                     />
                   </div>
                   <div className="flex justify-center gap-4 shrink-0">
-                    <button
-                      onClick={() => setShowForm(true)}
+                    <a
+                      href={pdfSrc}
+                      download="Agentic_AI_Syllabus.pdf"
                       className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
                     >
-                      Download PDF
-                    </button>
+                      Download Again
+                    </a>
                     <button
                       onClick={handleClose}
                       className="px-8 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-100 transition"
@@ -117,10 +132,12 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
                 <div className="flex-1 overflow-y-auto w-full bg-white px-2 py-8 sm:px-6 md:py-12">
                   <div className="max-w-4xl mx-auto bg-gray-50 rounded-2xl shadow-xl p-8 md:p-12 text-left relative">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 text-center">
-                      Enroll to Download
+                      {viewMode === "enroll" ? "Enroll in Agentic AI" : "Enroll to Download"}
                     </h2>
                     <p className="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
-                      Please provide your basic details below to enroll. The syllabus download will start automatically upon submission.
+                      {viewMode === "enroll" 
+                        ? "Please provide your basic details below, and our team will get back to you with the next steps."
+                        : "Please provide your basic details below to enroll. The syllabus download will start automatically upon submission."}
                     </p>
                     
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -147,15 +164,12 @@ const SyllabusModal = ({ isOpen, onClose, pdfSrc }) => {
                       </div>
                       <div className="md:col-span-2 mt-4 flex flex-col sm:flex-row gap-4">
                         <button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-md transition duration-300 shadow-md">
-                          {isSubmitting ? 'Submitting...' : 'Enroll and Download'}
-                        </button>
-                        <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 border border-gray-300 bg-white rounded-md font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm">
-                          Back to PDF
+                          {isSubmitting ? 'Submitting...' : (viewMode === 'enroll' ? 'Submit Enrollment' : 'Enroll and Download')}
                         </button>
                       </div>
                       {submitStatus === 'success' && (
                         <div className="md:col-span-2 text-green-700 text-sm font-medium text-center bg-green-50 p-3 rounded-md border border-green-200">
-                          Thank you! Your download should start automatically.
+                          {viewMode === "enroll" ? "Thank you for enrolling! We will be in touch shortly." : "Thank you! Your download should start automatically."}
                         </div>
                       )}
                       {submitStatus === 'error' && (

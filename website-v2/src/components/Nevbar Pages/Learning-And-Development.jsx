@@ -115,6 +115,7 @@ const sectors = [
    ========================================================= */
 const Learning = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [modalMode, setModalMode] = useState("download");
 
   return (
     <>
@@ -186,15 +187,30 @@ const Learning = () => {
 
 
                 <div className="flex gap-4 flex-wrap items-center">
-                  <Link
-                    to={`/learning-and-development/${sector.slug}`}
-                    className="text-blue-600 font-semibold hover:underline"
-                  >
-                    {sector.slug === "agentic-ai" ? "Enroll Now →" : "Explore Program →"}
-                  </Link>
+                  {sector.slug === "agentic-ai" ? (
+                    <button
+                      onClick={() => {
+                        setModalMode("enroll");
+                        setOpenModal(true);
+                      }}
+                      className="text-blue-600 font-semibold hover:underline"
+                    >
+                      Enroll Now →
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/learning-and-development/${sector.slug}`}
+                      className="text-blue-600 font-semibold hover:underline"
+                    >
+                      Explore Program →
+                    </Link>
+                  )}
                   {sector.slug === "agentic-ai" && (
                     <button
-                      onClick={() => setOpenModal(true)}
+                      onClick={() => {
+                        setModalMode("download");
+                        setOpenModal(true);
+                      }}
                       className="text-gray-700 hover:text-blue-600 font-semibold transition flex items-center gap-1"
                     >
                       <span>Download Syllabus</span>
@@ -230,6 +246,7 @@ const Learning = () => {
         isOpen={openModal} 
         onClose={() => setOpenModal(false)} 
         pdfSrc={agenticAiSyllabusPdf} 
+        initialMode={modalMode}
       />
     </>
   );
