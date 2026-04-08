@@ -59,12 +59,12 @@ const formatInline = (text, navigate) => {
     if (linkMatch) {
       const href = linkMatch[2].trim();
       const isExternal = href.startsWith('http') || href.startsWith('mailto:');
-      
+
       if (isExternal) {
         return (
-          <a 
-            key={i} 
-            href={href} 
+          <a
+            key={i}
+            href={href}
             className="text-[#3da4c1] hover:text-white underline decoration-[#3da4c1]/50 underline-offset-2 transition-colors font-medium break-words"
             target="_blank"
             rel="noreferrer"
@@ -74,9 +74,9 @@ const formatInline = (text, navigate) => {
         );
       } else {
         return (
-          <span 
-            key={i} 
-            onClick={() => navigate(href)} 
+          <span
+            key={i}
+            onClick={() => navigate(href)}
             className="cursor-pointer text-[#3da4c1] hover:text-white underline decoration-[#3da4c1]/50 underline-offset-2 transition-colors font-medium break-words inline-block"
             role="link"
           >
@@ -199,7 +199,7 @@ const ChatbotWidget = () => {
       <div
         style={{
           position: 'fixed',
-          bottom: position.bottom + 20,
+          bottom: position.bottom + 15,
           right: position.right,
           zIndex: 60,
         }}
