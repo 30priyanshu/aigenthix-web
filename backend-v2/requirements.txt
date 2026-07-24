@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+PyJWT[crypto]
+bcrypt
+python-multipart
+cloudinary
+python-dotenv
+python-slugify
+redis
+psycopg2-binary
+slowapi
+resend
+pydantic[email]
+google-genai

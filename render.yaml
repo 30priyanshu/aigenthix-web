@@ -1,0 +1,110 @@
+# Render Blueprint for AiGENThix CMS
+# This file defines all services for deployment on Render
+# Use: render.com > New > Blueprint > Connect this repo
+
+services:
+  # ============================================
+  # Backend API (Python FastAPI)
+  # ============================================
+  - type: web
+    name: aigenthix-backend
+    runtime: python
+    rootDir: backend-v2
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false  # Set manually - Neon PostgreSQL connection string
+      - key: CORS_ORIGINS
+        sync: false  # Set manually - Your CMS and Website URLs
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: DEBUG
+        value: "false"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+      - key: AUTH_RATE_LIMIT_PER_MINUTE
+        value: "5"
+      - key: CACHE_TTL
+        value: "300"
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_USE_TLS
+        value: "true"
+      - key: SMTP_USE_SSL
+        value: "false"
+      - key: SMTP_TIMEOUT_SECONDS
+        value: "10"
+      - key: CONTACT_NOTIFICATION_TO
+        value: "akankshasomvanshi@gmail.com"
+      - key: CONTACT_NOTIFICATION_FROM
+        sync: false
+      - key: CONTACT_NOTIFICATION_SUBJECT_PREFIX
+        value: "[AiGENThix Contact]"
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ============================================
+  # CMS Admin (Static HTML/CSS/JS)
+  # ============================================
+  - type: web
+    name: aigenthix-cms
+    runtime: static
+    rootDir: cms-admin-v2
+    staticPublishPath: ./
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+      - path: /*.html
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: true
+
+  # ============================================
+  # Website (Vite/React - Static Site)
+  # ============================================
+  - type: web
+    name: aigenthix-website
+    runtime: static
+    rootDir: website-v2
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Set manually - Your backend API URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: true
