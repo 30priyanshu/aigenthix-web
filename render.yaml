@@ -66,18 +66,19 @@ services:
   - type: web
     name: aigenthix-cms
     runtime: static
-    rootDir: cms-admin-v2
-    staticPublishPath: ./
+    rootDir: cms-admin-react
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
     headers:
       - path: /*
         name: Cache-Control
-        value: public, max-age=3600
+        value: public, max-age=31536000, immutable
       - path: /index.html
         name: Cache-Control
         value: no-cache
-      - path: /*.html
-        name: Cache-Control
-        value: no-cache
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Set manually - Your backend API URL
     routes:
       - type: rewrite
         source: /*
