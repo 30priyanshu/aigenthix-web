@@ -37,26 +37,14 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-      - key: SMTP_HOST
+      - key: RESEND_API_KEY
         sync: false
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_USERNAME
+      - key: CONTACT_NOTIFICATION_EMAIL
         sync: false
-      - key: SMTP_PASSWORD
+      - key: CONTACT_FROM_EMAIL
         sync: false
-      - key: SMTP_USE_TLS
-        value: "true"
-      - key: SMTP_USE_SSL
-        value: "false"
-      - key: SMTP_TIMEOUT_SECONDS
-        value: "10"
-      - key: CONTACT_NOTIFICATION_TO
-        value: "akankshasomvanshi@gmail.com"
-      - key: CONTACT_NOTIFICATION_FROM
+      - key: GEMINI_API_KEY
         sync: false
-      - key: CONTACT_NOTIFICATION_SUBJECT_PREFIX
-        value: "[AiGENThix Contact]"
     healthCheckPath: /health
     autoDeploy: true
 
