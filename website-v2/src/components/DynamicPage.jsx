@@ -48,6 +48,66 @@ const fadeUp = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
 };
 
+const DynamicContentBlocks = ({ cd, defaultHeader }) => {
+    if (!cd) return null;
+    const expertiseCards = Array.isArray(cd.expertise_cards) ? cd.expertise_cards : [];
+    const extraDetails = Array.isArray(cd.extra_details) ? cd.extra_details : [];
+
+    return (
+        <>
+            {/* EXPERTISE CARDS GRID */}
+            {expertiseCards.length > 0 && (
+                <section className="py-20 bg-white text-center">
+                    <motion.h2 className="text-3xl font-bold text-gray-900 mb-4" variants={fadeUp} initial="hidden" whileInView="visible">
+                        {cd.expertise_header || defaultHeader || 'Our Expertise'}
+                    </motion.h2>
+                    {cd.expertise_description && (
+                        <motion.p className="text-gray-600 max-w-2xl mx-auto mb-12" variants={fadeUp} initial="hidden" whileInView="visible">
+                            {cd.expertise_description}
+                        </motion.p>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-6 mt-8">
+                        {expertiseCards.map((f, i) => (
+                            <motion.div key={i} className="bg-[#f8f9ff] p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300" variants={fadeUp} initial="hidden" whileInView="visible">
+                                {f.icon && <div className="text-4xl mb-4 flex justify-center">{iconMap[f.icon] || <FaCheckCircle className="text-[#2D4DE8]" />}</div>}
+                                <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed">{f.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* EXTRA DETAILS SECTIONS */}
+            {extraDetails.length > 0 && extraDetails.map((section, index) => {
+                const isEven = index % 2 === 0;
+                return (
+                    <section key={index} className={`flex flex-wrap items-center justify-between max-w-6xl mx-auto py-20 px-10 gap-10 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
+                        {section.image_url && (
+                            <motion.div className="flex-1 min-w-[320px]" variants={fadeUp} initial="hidden" whileInView="visible">
+                                <img src={section.image_url} alt={section.title} className="w-full h-[300px] object-cover rounded-xl shadow-lg" />
+                            </motion.div>
+                        )}
+                        <motion.div className="flex-1" variants={fadeUp} initial="hidden" whileInView="visible">
+                            <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
+                            <p className="text-gray-600 mb-6">{section.description}</p>
+                            {section.tools && section.tools.length > 0 && (
+                                <div className="flex flex-wrap gap-3">
+                                    {section.tools.map((t, i) => (
+                                        <span key={i} className="bg-[#e9edff] text-[#2D4DE8] px-4 py-2 rounded-full text-sm font-medium">
+                                            {t}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </motion.div>
+                    </section>
+                );
+            })}
+        </>
+    );
+};
+
 const ProductTemplate = ({ data }) => {
     const title = data.title;
     const description = data.description;
@@ -72,24 +132,7 @@ const ProductTemplate = ({ data }) => {
                 <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{description}</p>
               </div>
 
-              {features.length > 0 && (
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold mb-6">Platform Capabilities</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {features.map((item, index) => (
-                      <div key={index} className="bg-gray-50 border rounded-xl p-6 hover:shadow-lg transition duration-300">
-                        <div className="flex items-start gap-4">
-                          <FaCheckCircle className="text-xl text-[#2D4DE8] mt-1 shrink-0" />
-                          <div>
-                            <h4 className="font-semibold text-lg mb-1">{item.title}</h4>
-                            <p className="text-sm text-gray-600">{item.desc}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <DynamicContentBlocks cd={data.content_data} defaultHeader="Platform Capabilities" />
 
               {demoVideo && (
                 <div>
@@ -128,10 +171,6 @@ const ProductTemplate = ({ data }) => {
 const ServiceTemplate = ({ data }) => {
     const title = data.title;
     const description = data.description;
-    const features = parseFeatures(data.benefits);
-    
-    const strategyTags = parseCommaList(data.strategy_tags);
-    const businessTags = parseCommaList(data.business_tags);
 
     return (
         <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800" style={{ paddingTop: '80px' }}>
@@ -147,62 +186,8 @@ const ServiceTemplate = ({ data }) => {
                 </div>
             </section>
 
-            {/* FEATURES */}
-            {features.length > 0 && (
-                <section className="py-20 bg-white text-center">
-                    <motion.h2 className="text-3xl font-bold text-gray-900 mb-12" variants={fadeUp} initial="hidden" whileInView="visible">
-                        Our Expertise
-                    </motion.h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-                        {features.map((f, i) => (
-                            <motion.div key={i} className="bg-[#f8f9ff] p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300" variants={fadeUp} initial="hidden" whileInView="visible">
-                                <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
-                                <p className="text-gray-600 text-sm leading-relaxed">{f.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* STRATEGY */}
-            {data.strategy_title && (
-                <section className="flex flex-wrap items-center justify-between max-w-6xl mx-auto py-20 px-10 gap-10">
-                    {data.strategy_image_url && (
-                        <motion.div className="flex-1 min-w-[320px]" variants={fadeUp} initial="hidden" whileInView="visible">
-                            <img src={data.strategy_image_url} alt="Strategy" className="w-full h-[300px] object-cover rounded-xl shadow-lg" />
-                        </motion.div>
-                    )}
-                    <motion.div className="flex-1" variants={fadeUp} initial="hidden" whileInView="visible">
-                        <h3 className="text-2xl font-bold mb-4">{data.strategy_title}</h3>
-                        <p className="text-gray-600 mb-6">{data.strategy_description}</p>
-                        <div className="flex flex-wrap gap-3">
-                            {strategyTags.map((t, i) => (
-                                <span key={i} className="bg-[#e9edff] text-[#2D4DE8] px-4 py-2 rounded-full text-sm font-medium">{t}</span>
-                            ))}
-                        </div>
-                    </motion.div>
-                </section>
-            )}
-
-            {/* BUSINESS */}
-            {data.business_title && (
-                <section className="flex flex-wrap items-center justify-between max-w-6xl mx-auto py-20 px-10 gap-10">
-                    <motion.div className="flex-1" variants={fadeUp} initial="hidden" whileInView="visible">
-                        <h3 className="text-2xl font-bold mb-4">{data.business_title}</h3>
-                        <p className="text-gray-600 mb-6">{data.business_description}</p>
-                        <div className="flex flex-wrap gap-3">
-                            {businessTags.map((t, i) => (
-                                <span key={i} className="bg-[#e9edff] text-[#2D4DE8] px-4 py-2 rounded-full text-sm font-medium">{t}</span>
-                            ))}
-                        </div>
-                    </motion.div>
-                    {data.business_image_url && (
-                        <motion.div className="flex-1 min-w-[320px]" variants={fadeUp} initial="hidden" whileInView="visible">
-                            <img src={data.business_image_url} alt="Business" className="w-full h-[300px] object-cover rounded-xl shadow-lg" />
-                        </motion.div>
-                    )}
-                </section>
-            )}
+            {/* DYNAMIC CONTENT BLOCKS (Expertise Cards & Extra Details) */}
+            <DynamicContentBlocks cd={data.content_data} defaultHeader="Our Expertise" />
 
             {/* CTA */}
             <section className="bg-[#2D4DE8] text-white text-center py-16 px-6">
@@ -225,46 +210,22 @@ const ServiceTemplate = ({ data }) => {
 const IndustryTemplate = ({ data }) => {
     const title = data.name || data.title;
     const description = data.description;
-    const capabilities = parseFeatures(data.capabilities);
 
     return (
         <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800" style={{ paddingTop: '80px' }}>
-            <section className="relative py-20 lg:py-32 text-center bg-[#0B2847] text-white">
+            <section className="relative py-20 lg:py-32 text-center about-hero">
+                <div className="hero-overlay" />
                 <div className="relative max-w-7xl mx-auto px-6">
                     <motion.h1 className="text-5xl lg:text-7xl font-black mb-6" variants={fadeUp} initial="hidden" whileInView="visible">
                         {title}
                     </motion.h1>
-                    <motion.p className="text-xl lg:text-2xl italic max-w-4xl mx-auto text-gray-300" variants={fadeUp} initial="hidden" whileInView="visible">
+                    <motion.p className="text-xl lg:text-2xl italic max-w-4xl mx-auto" variants={fadeUp} initial="hidden" whileInView="visible">
                         {description}
                     </motion.p>
                 </div>
             </section>
 
-            {capabilities.length > 0 && (
-                <section className="py-20 bg-white text-center">
-                    <h2 className="text-3xl font-bold mb-12">Capabilities</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-                        {capabilities.map((f, i) => (
-                            <div key={i} className="bg-[#f8f9ff] p-8 rounded-xl border shadow-sm">
-                                <h3 className="text-xl font-semibold mb-2">{f.title}</h3>
-                                <p className="text-gray-600 text-sm">{f.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {data.strategy_title && (
-                <section className="flex flex-wrap items-center max-w-6xl mx-auto py-20 px-10 gap-10">
-                    {data.strategy_image_url && (
-                        <motion.img src={data.strategy_image_url} className="flex-1 min-w-[320px] rounded-xl shadow-lg object-cover h-[300px]" variants={fadeUp} initial="hidden" whileInView="visible" />
-                    )}
-                    <motion.div className="flex-1" variants={fadeUp} initial="hidden" whileInView="visible">
-                        <h3 className="text-2xl font-bold mb-4">{data.strategy_title}</h3>
-                        <p className="text-gray-600 mb-4 whitespace-pre-line">{data.strategy_description}</p>
-                    </motion.div>
-                </section>
-            )}
+            <DynamicContentBlocks cd={data.content_data} defaultHeader="Capabilities" />
 
             <section className="bg-[#2D4DE8] text-white text-center py-16">
                 <h2 className="text-3xl font-bold mb-4">{data.cta_title || `Power Your ${title} Growth`}</h2>
