@@ -451,10 +451,10 @@ const BlogDetails = () => {
                       
                       {/* Tooltip */}
                       {blog.author_bio && (
-                        <div className="absolute bottom-full left-0 mb-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                        <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
                           <div className="font-semibold mb-1 text-base">{blog.author_name}</div>
                           <p className="text-gray-300 leading-relaxed text-[13px]">{blog.author_bio}</p>
-                          <div className="absolute top-full left-6 -mt-1 border-8 border-transparent border-t-gray-900"></div>
+                          <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
                         </div>
                       )}
                     </div>
@@ -481,10 +481,10 @@ const BlogDetails = () => {
                       
                       {/* Tooltip */}
                       {blog.fact_checker_bio && (
-                        <div className="absolute bottom-full left-0 mb-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                        <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
                           <div className="font-semibold mb-1 text-base">{blog.fact_checker_name}</div>
                           <p className="text-gray-300 leading-relaxed text-[13px]">{blog.fact_checker_bio}</p>
-                          <div className="absolute top-full left-6 -mt-1 border-8 border-transparent border-t-gray-900"></div>
+                          <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
                         </div>
                       )}
                     </div>
