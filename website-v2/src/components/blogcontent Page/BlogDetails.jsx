@@ -128,7 +128,7 @@ const BlogDetails = () => {
     };
 
     const finalParts = parts.length > 0 ? parts : processLinks(html);
-    
+
     // If we already split by iframe, we still need to process links in the HTML chunks
     if (parts.length > 0) {
       return parts.map((part, i) => {
@@ -138,7 +138,7 @@ const BlogDetails = () => {
         return part;
       });
     }
-    
+
     return finalParts;
   };
 
@@ -373,10 +373,10 @@ const BlogDetails = () => {
           structuredData={[articleSchema, blogBreadcrumb].filter(Boolean)}
         />
       )}
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ marginTop: "80px" }}>
         <div className="flex flex-col lg:flex-row gap-10">
-          
+
           {/* MAIN CONTENT - LEFT SIDE (70%) */}
           <div className="w-full lg:w-[70%]">
             <motion.article
@@ -412,7 +412,7 @@ const BlogDetails = () => {
                       {blog.category}
                     </div>
                   )}
-                  
+
                   {/* Share Icons in Meta row */}
                   <div className="flex items-center space-x-3 ml-auto">
                     <button onClick={() => shareArticle('twitter')} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500" title="Share on Twitter">
@@ -448,13 +448,13 @@ const BlogDetails = () => {
                           {blog.author_instagram && <a href={blog.author_instagram} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#E4405F] transition-colors"><FaInstagram className="w-[14px] h-[14px]" /></a>}
                         </div>
                       </div>
-                      
+
                       {/* Tooltip */}
                       {blog.author_bio && (
-                        <div className="absolute bottom-full left-0 mb-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                        <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
                           <div className="font-semibold mb-1 text-base">{blog.author_name}</div>
                           <p className="text-gray-300 leading-relaxed text-[13px]">{blog.author_bio}</p>
-                          <div className="absolute top-full left-6 -mt-1 border-8 border-transparent border-t-gray-900"></div>
+                          <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
                         </div>
                       )}
                     </div>
@@ -478,13 +478,13 @@ const BlogDetails = () => {
                         </div>
                         <div className="font-bold text-gray-900 text-[15px] hover:text-blue-600 transition-colors">{blog.fact_checker_name}</div>
                       </div>
-                      
+
                       {/* Tooltip */}
                       {blog.fact_checker_bio && (
-                        <div className="absolute bottom-full left-0 mb-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                        <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
                           <div className="font-semibold mb-1 text-base">{blog.fact_checker_name}</div>
                           <p className="text-gray-300 leading-relaxed text-[13px]">{blog.fact_checker_bio}</p>
-                          <div className="absolute top-full left-6 -mt-1 border-8 border-transparent border-t-gray-900"></div>
+                          <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
                         </div>
                       )}
                     </div>
@@ -573,23 +573,23 @@ const BlogDetails = () => {
                         <User className="h-10 w-10 text-gray-500" />
                       </div>
                     )}
-                  <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1">{blog.author_name}</h3>
-                    {blog.author_title && (
-                      <p className="text-blue-600 font-medium mb-3">{blog.author_title}</p>
-                    )}
-                    {blog.author_bio && (
-                      <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">{blog.author_bio}</p>
-                    )}
-                    <div className="flex items-center justify-center md:justify-start gap-4">
-                      {blog.author_twitter && <a href={blog.author_twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1DA1F2] hover:border-[#1DA1F2] transition-colors"><FaTwitter className="w-4 h-4" /></a>}
-                      {blog.author_linkedin && <a href={blog.author_linkedin} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#0A66C2] hover:border-[#0A66C2] transition-colors"><FaLinkedin className="w-4 h-4" /></a>}
-                      {blog.author_facebook && <a href={blog.author_facebook} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1877F2] hover:border-[#1877F2] transition-colors"><FaFacebook className="w-4 h-4" /></a>}
-                      {blog.author_instagram && <a href={blog.author_instagram} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#E4405F] hover:border-[#E4405F] transition-colors"><FaInstagram className="w-4 h-4" /></a>}
-                      {blog.author_github && <a href={blog.author_github} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-colors"><FaGithub className="w-4 h-4" /></a>}
-                      {blog.author_website && <a href={blog.author_website} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-blue-500 hover:border-blue-500 transition-colors"><FaGlobe className="w-4 h-4" /></a>}
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">{blog.author_name}</h3>
+                      {blog.author_title && (
+                        <p className="text-blue-600 font-medium mb-3">{blog.author_title}</p>
+                      )}
+                      {blog.author_bio && (
+                        <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">{blog.author_bio}</p>
+                      )}
+                      <div className="flex items-center justify-center md:justify-start gap-4">
+                        {blog.author_twitter && <a href={blog.author_twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1DA1F2] hover:border-[#1DA1F2] transition-colors"><FaTwitter className="w-4 h-4" /></a>}
+                        {blog.author_linkedin && <a href={blog.author_linkedin} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#0A66C2] hover:border-[#0A66C2] transition-colors"><FaLinkedin className="w-4 h-4" /></a>}
+                        {blog.author_facebook && <a href={blog.author_facebook} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1877F2] hover:border-[#1877F2] transition-colors"><FaFacebook className="w-4 h-4" /></a>}
+                        {blog.author_instagram && <a href={blog.author_instagram} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#E4405F] hover:border-[#E4405F] transition-colors"><FaInstagram className="w-4 h-4" /></a>}
+                        {blog.author_github && <a href={blog.author_github} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-colors"><FaGithub className="w-4 h-4" /></a>}
+                        {blog.author_website && <a href={blog.author_website} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-blue-500 hover:border-blue-500 transition-colors"><FaGlobe className="w-4 h-4" /></a>}
+                      </div>
                     </div>
-                  </div>
                   </div>
                 </div>
               )}
@@ -638,7 +638,7 @@ const BlogDetails = () => {
 
           {/* SIDEBAR - RIGHT SIDE (30%) */}
           <div className="w-full lg:w-[30%] space-y-8 lg:pl-4 lg:sticky lg:top-32 lg:self-start">
-            
+
             {/* CTA CARD */}
             <div className="bg-[#002B5B] text-white p-8 rounded-2xl shadow-lg text-center">
               <h3 className="text-2xl font-bold mb-3">Empower Your Business with AI</h3>
@@ -722,7 +722,7 @@ const BlogDetails = () => {
                 </span>
               </div>
             </div>
-            
+
           </div>
 
         </div>
