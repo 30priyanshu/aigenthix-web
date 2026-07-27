@@ -55,6 +55,10 @@ const request = async (endpoint, options = {}, requireAuth = false) => {
             throw new ApiError('Session expired', 401);
         }
 
+        if (response.status === 204) {
+            return null;
+        }
+
         let data;
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {

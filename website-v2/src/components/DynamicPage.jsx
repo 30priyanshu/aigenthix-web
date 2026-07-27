@@ -255,13 +255,16 @@ const DynamicPage = ({ type }) => {
         if (type === 'industries') items = await cmsService.getIndustries();
         if (type === 'rd') items = await cmsService.getRDs();
 
-        const match = items.find(i => i.slug === slug);
-        if (match && (match.status === 'published' || match.is_published)) {
+        const decodedSlug = decodeURIComponent(slug);
+        const match = items.find(i => (i.slug === slug || i.slug === decodedSlug) && (i.status === 'published' || i.is_published));
+        
+        if (match) {
           if (typeof match.content_data === 'string') {
              try { match.content_data = JSON.parse(match.content_data); } catch(e) {}
           }
           setData(match);
         } else {
+          console.error(`No published item found for slug: ${slug} in type: ${type}`);
           navigate('/404', { replace: true });
         }
       } catch (error) {
