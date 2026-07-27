@@ -18,7 +18,7 @@ services:
       - key: DATABASE_URL
         sync: false  # Set manually - Neon PostgreSQL connection string
       - key: CORS_ORIGINS
-        value: "https://aigenthix-cms.onrender.com,https://aigenthix-website.onrender.com"
+        value: "https://aigenthix-cms.onrender.com,https://aigenthix-web.vercel.app,https://aigenthix-website.onrender.com"
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
