@@ -18,7 +18,7 @@ services:
       - key: DATABASE_URL
         sync: false  # Set manually - Neon PostgreSQL connection string
       - key: CORS_ORIGINS
-        value: "https://aigenthix-cms.onrender.com,https://aigenthix-web.vercel.app,https://aigenthix-website.onrender.com"
+        value: "https://aigenthix-cms-oe06.onrender.com,https://aigenthix-web.vercel.app,https://aigenthix-website-3qs7.onrender.com"
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
@@ -66,7 +66,7 @@ services:
         value: no-cache
     envVars:
       - key: VITE_API_URL
-        value: "https://aigenthix-backend.onrender.com"
+        value: "https://aigenthix-backend-dhmx.onrender.com"
     routes:
       - type: rewrite
         source: /*
@@ -91,7 +91,7 @@ services:
         value: no-cache
     envVars:
       - key: VITE_API_URL
-        value: "https://aigenthix-backend.onrender.com"
+        value: "https://aigenthix-backend-dhmx.onrender.com"
     routes:
       - type: rewrite
         source: /*
