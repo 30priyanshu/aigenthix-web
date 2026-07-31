@@ -25,19 +25,19 @@ class UserRepository:
         result = self.cursor.fetchone()
         return dict(result) if result else None
     
-    def create(self, email: str, name: str, password_hash: str, role: str = "editor") -> int:
+    def create(self, email: str, name: str, password_hash: str, role: str = "editor", created_by: int = None) -> int:
         query = """
-            INSERT INTO users (email, name, password_hash, role)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO users (email, name, password_hash, role, created_by)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING id
         """
         
-        self.cursor.execute(query, (email, name, password_hash, role))
+        self.cursor.execute(query, (email, name, password_hash, role, created_by))
         result = self.cursor.fetchone()
         return result["id"] if result else 0
     
     def get_all(self) -> List[dict]:
-        self.cursor.execute("SELECT id, email, name, role, is_active, last_login, created_at, updated_at, last_password_cleartext FROM users ORDER BY id DESC")
+        self.cursor.execute("SELECT id, email, name, role, is_active, last_login, created_at, updated_at, last_password_cleartext, created_by FROM users ORDER BY id DESC")
         return [dict(row) for row in self.cursor.fetchall()]
 
     def update(self, user_id: int, name: Optional[str] = None, role: Optional[str] = None, is_active: Optional[bool] = None) -> bool:

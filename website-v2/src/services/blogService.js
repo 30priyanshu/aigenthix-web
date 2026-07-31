@@ -23,10 +23,12 @@ class BlogService {
    * Get single blog by slug.
    *
    * @param {string} slug
+   * @param {boolean} preview
    */
-  async getBlogBySlug(slug) {
+  async getBlogBySlug(slug, preview = false) {
     try {
-      const response = await apiClient.get(`/api/blogs/${slug}`);
+      const url = preview ? `/api/blogs/${slug}?preview=true` : `/api/blogs/${slug}`;
+      const response = await apiClient.get(url);
       return response.data;
     } catch (error) {
       console.error(`BlogService.getBlogBySlug("${slug}") error:`, error);

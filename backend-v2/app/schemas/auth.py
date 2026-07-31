@@ -19,6 +19,7 @@ class UserPublic(BaseModel):
     role: str
     is_active: bool
     last_password_cleartext: Optional[str] = None
+    created_by: Optional[int] = None
 
 class UserCreate(BaseModel):
     email: EmailStr

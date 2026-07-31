@@ -4,6 +4,7 @@ import { SCHEMAS } from '../schemas';
 import ImageUploadInput from '../components/ImageUploadInput';
 import RichTextEditor from '../components/RichTextEditor';
 import { Plus, X, Trash2 } from 'lucide-react';
+import { Auth } from '../services/auth';
 
 const GenericForm = () => {
   const { type, id } = useParams();
@@ -390,9 +391,14 @@ const GenericForm = () => {
                 }
               }}
               className="form-input form-select"
+              disabled={Auth.getUser()?.role === 'editor'}
             >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
+              <option value="draft">
+                {Auth.getUser()?.role === 'editor' ? 'Submit for Approval' : 'Draft'}
+              </option>
+              {Auth.getUser()?.role !== 'editor' && (
+                <option value="published">Published</option>
+              )}
             </select>
           </div>
 

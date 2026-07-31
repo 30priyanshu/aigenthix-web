@@ -1,4 +1,7 @@
 import html
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from typing import Optional
 
 import resend
@@ -13,18 +16,70 @@ class EmailService:
 
     def __init__(self) -> None:
         self._to_email = settings.CONTACT_NOTIFICATION_EMAIL
-        self._from_email = settings.CONTACT_FROM_EMAIL or "AiGENThix <onboarding@resend.dev>"
-        self._configured = bool(settings.RESEND_API_KEY and self._to_email)
-
-        if self._configured:
-            resend.api_key = settings.RESEND_API_KEY
-            logger.info(f"EmailService initialized | from={self._from_email} | to={self._to_email}")
+        
+        raw_from = settings.CONTACT_FROM_EMAIL or "noreply@aigenthix.com"
+        
+        # Format "AiGENThix Team" display name for SMTP use
+        if "<" not in raw_from:
+            self._from_email_smtp = f"AiGENThix Team <{raw_from}>"
         else:
-            logger.warning("EmailService disabled | missing RESEND_API_KEY or CONTACT_NOTIFICATION_EMAIL")
+            self._from_email_smtp = raw_from
+            
+        # Resend strictly requires the sender domain to be verified or it will throw an error.
+        # Since SMTP uses a custom email (like gmail.com), sending from that custom email via Resend will fail.
+        # We force Resend to use its verified default address.
+        self._from_email_resend = "AiGENThix <onboarding@resend.dev>"
+
+        # Resend Config
+        self.resend_configured = bool(settings.RESEND_API_KEY and self._to_email)
+        if self.resend_configured:
+            resend.api_key = settings.RESEND_API_KEY
+            logger.info(f"EmailService (Resend) initialized | from={self._from_email_resend} | to={self._to_email}")
+
+        # SMTP Config
+        self.smtp_host = settings.SMTP_HOST
+        self.smtp_port = settings.SMTP_PORT
+        self.smtp_user = settings.SMTP_USER
+        self.smtp_password = settings.SMTP_PASSWORD
+        self.use_tls = settings.SMTP_USE_TLS
+
+        self.smtp_configured = bool(self.smtp_host and self.smtp_port and self._to_email)
+
+        if self.smtp_configured:
+            logger.info(f"EmailService (SMTP) initialized | host={self.smtp_host}:{self.smtp_port} | from={self._from_email_smtp} | to={self._to_email}")
+
+        if not self.resend_configured and not self.smtp_configured:
+            logger.warning("EmailService disabled | Both Resend and SMTP are unconfigured")
 
     @property
     def is_configured(self) -> bool:
-        return self._configured
+        return self.resend_configured or self.smtp_configured
+
+    def _send_email_smtp(self, to_emails: list[str], subject: str, html_content: str, reply_to: str = None) -> bool:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = self._from_email_smtp
+        msg["To"] = ", ".join(to_emails)
+        if reply_to:
+            msg["Reply-To"] = reply_to
+            
+        part2 = MIMEText(html_content, "html")
+        msg.attach(part2)
+
+        try:
+            with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                server.ehlo()
+                if self.use_tls:
+                    server.starttls()
+                    server.ehlo()
+                if self.smtp_user and self.smtp_password:
+                    server.login(self.smtp_user, self.smtp_password)
+                
+                server.sendmail(self._from_email_smtp, to_emails, msg.as_string())
+            return True
+        except Exception as exc:
+            logger.error(f"SMTP email send failed | to={to_emails} | error={type(exc).__name__}: {exc}")
+            return False
 
     def send_contact_notification(
         self,
@@ -38,8 +93,8 @@ class EmailService:
         comments: str,
         phone_number: Optional[str] = None,
     ) -> bool:
-        if not self._configured:
-            logger.debug(f"Email skipped (not configured) | email={email}")
+        if not self.resend_configured:
+            logger.debug(f"Email skipped (Resend not configured) | email={email}")
             return False
 
         safe = {
@@ -55,7 +110,7 @@ class EmailService:
 
         try:
             params: resend.Emails.SendParams = {
-                "from": self._from_email,
+                "from": self._from_email_resend,
                 "to": [self._to_email],
                 "subject": f"[AiGENThix Contact] {safe['first_name']} {safe['last_name']} — {safe['company_name']}",
                 "html": self._build_html(safe),
@@ -64,7 +119,7 @@ class EmailService:
 
             result = resend.Emails.send(params)
             logger.info(
-                f"Email sent | resend_id={result.get('id', 'unknown')} | "
+                f"Email sent (Resend) | resend_id={result.get('id', 'unknown')} | "
                 f"to={self._to_email} | from_contact={email} | company={company_name}"
             )
             return True
@@ -88,8 +143,8 @@ class EmailService:
         resume_url: Optional[str] = None,
         resume_filename: Optional[str] = None,
     ) -> bool:
-        if not self._configured:
-            logger.debug(f"Email skipped (not configured) | email={email}")
+        if not self.resend_configured:
+            logger.debug(f"Email skipped (Resend not configured) | email={email}")
             return False
 
         safe = {
@@ -104,7 +159,7 @@ class EmailService:
 
         try:
             params: resend.Emails.SendParams = {
-                "from": self._from_email,
+                "from": self._from_email_resend,
                 "to": [self._to_email],
                 "subject": f"[AiGENThix Careers] {safe['full_name']} — {safe['position']}",
                 "html": self._build_careers_html(safe),
@@ -122,7 +177,7 @@ class EmailService:
 
             result = resend.Emails.send(params)
             logger.info(
-                f"Email sent | resend_id={result.get('id', 'unknown')} | "
+                f"Email sent (Resend) | resend_id={result.get('id', 'unknown')} | "
                 f"to={self._to_email} | from_contact={email} | position={position}"
             )
             return True
@@ -145,8 +200,8 @@ class EmailService:
         message: str,
         phone_number: Optional[str] = None,
     ) -> bool:
-        if not self._configured:
-            logger.debug(f"Email skipped (not configured) | email={email}")
+        if not self.resend_configured:
+            logger.debug(f"Email skipped (Resend not configured) | email={email}")
             return False
 
         safe = {
@@ -161,7 +216,7 @@ class EmailService:
 
         try:
             params: resend.Emails.SendParams = {
-                "from": self._from_email,
+                "from": self._from_email_resend,
                 "to": [self._to_email],
                 "subject": f"[AiGENThix Enrollment] {safe['program_title']} — {safe['first_name']} {safe['last_name']}",
                 "html": self._build_enrollment_html(safe),
@@ -170,7 +225,7 @@ class EmailService:
 
             result = resend.Emails.send(params)
             logger.info(
-                f"Email sent | resend_id={result.get('id', 'unknown')} | "
+                f"Email sent (Resend) | resend_id={result.get('id', 'unknown')} | "
                 f"to={self._to_email} | from_contact={email} | program={program_title}"
             )
             return True
@@ -190,8 +245,8 @@ class EmailService:
         role: str,
         temp_password: str,
     ) -> bool:
-        if not self._configured:
-            logger.debug(f"Email skipped (not configured) | email={email}")
+        if not self.smtp_configured:
+            logger.debug(f"Email skipped (SMTP not configured) | email={email}")
             return False
 
         safe = {
@@ -202,24 +257,13 @@ class EmailService:
             "login_url": html.escape(settings.CMS_FRONTEND_URL),
         }
 
-        try:
-            params: resend.Emails.SendParams = {
-                "from": self._from_email,
-                "to": [email],
-                "subject": "Your AiGENThix CMS Access Details",
-                "html": self._build_access_html(safe),
-            }
-
-            result = resend.Emails.send(params)
-            logger.info(f"Access email sent | resend_id={result.get('id', 'unknown')} | to={email}")
-            return True
-
-        except resend.exceptions.ResendError as exc:
-            logger.error(f"Resend API error | email={email} | error={exc}")
-            return False
-        except Exception as exc:
-            logger.error(f"Email send failed | email={email} | error={type(exc).__name__}: {exc}")
-            return False
+        subject = "Your AiGENThix CMS Access Details"
+        html_content = self._build_access_html(safe)
+        
+        success = self._send_email_smtp([email], subject, html_content)
+        if success:
+            logger.info(f"Access email sent (SMTP) | to={email}")
+        return success
 
     @staticmethod
     def _build_html(safe: dict) -> str:

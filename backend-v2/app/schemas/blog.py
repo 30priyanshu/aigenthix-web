@@ -40,6 +40,7 @@ class BlogBase(BaseModel):
     
     published: bool = False
     is_featured: bool = False
+    status: str = Field("draft", max_length=20)
     
     @field_validator("featured_image_url", "cta_url", "author_website", mode="before")
     @classmethod
@@ -115,6 +116,7 @@ class BlogPublic(BaseModel):
     read_time: int
     published: bool
     is_featured: bool
+    status: str
     created_at: datetime
     updated_at: datetime
 
@@ -131,7 +133,9 @@ class BlogListItem(BaseModel):
     read_time: int
     published: bool
     is_featured: bool
+    status: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
 
 class BlogPageData(BaseModel):

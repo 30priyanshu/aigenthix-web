@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Plus, RefreshCw, Key, X, Eye, EyeOff } from 'lucide-react';
+import { LogOut, Plus, RefreshCw, Key, X, Eye, EyeOff, Bell } from 'lucide-react';
 import { Auth } from '../services/auth';
-import { AuthApi } from '../services/api';
+import { AuthApi, ActivitiesApi } from '../services/api';
 
 const TopHeader = ({ title = 'CMS', onRefresh }) => {
   const navigate = useNavigate();
@@ -16,17 +16,39 @@ const TopHeader = ({ title = 'CMS', onRefresh }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [activities, setActivities] = useState([]);
+  
+  useEffect(() => {
+    fetchActivities();
+    const interval = setInterval(fetchActivities, 30000); // Fetch every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchActivities = async () => {
+      try {
+          const data = await ActivitiesApi.getRecent();
+          setActivities(data || []);
+      } catch (e) {
+          console.error("Failed to fetch activities", e);
+      }
+  };
+
+  const markAllRead = async () => {
+      try {
+          await ActivitiesApi.markAllRead();
+          setActivities(activities.map(a => ({...a, is_read: true})));
+      } catch (e) {
+          console.error(e);
+      }
+  };
 
   const handleLogout = () => {
     Auth.logout();
     navigate('/login');
   };
 
-  const handleNewItem = () => {
-    // Ensure we don't append /new if we are already on /new or /edit
-    const basePath = location.pathname.split('/new')[0].split('/edit')[0];
-    navigate(`${basePath}/new`);
-  };
+  const unreadCount = activities.filter(a => !a.is_read).length;
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -71,10 +93,56 @@ const TopHeader = ({ title = 'CMS', onRefresh }) => {
           <RefreshCw size={20} />
         </button>
         
+            <div style={{ position: 'relative' }}>
+                <button 
+                    onClick={() => { setIsNotificationOpen(!isNotificationOpen); setIsProfileDropdownOpen(false); }}
+                    className="btn btn-icon btn-ghost" 
+                    title="Notifications" 
+                    style={{ position: 'relative', color: 'var(--color-text-secondary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                >
+                    <Bell size={20} />
+                    {unreadCount > 0 && (
+                        <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#ef4444', color: 'white', fontSize: '10px', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                            {unreadCount}
+                        </span>
+                    )}
+                </button>
+
+                {isNotificationOpen && (
+                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', width: '320px', zIndex: 50, overflow: 'hidden' }}>
+                        <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
+                            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Notifications</h3>
+                            {unreadCount > 0 && (
+                                <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--color-accent-blue)', fontSize: '0.75rem', cursor: 'pointer' }}>Mark all read</button>
+                            )}
+                        </div>
+                        <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                            {activities.length === 0 ? (
+                                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>No recent activity</div>
+                            ) : (
+                                activities.map(act => (
+                                    <div key={act.id} style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--color-border)', background: act.is_read ? 'transparent' : 'rgba(59, 130, 246, 0.05)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                            <span style={{ fontSize: '0.875rem', fontWeight: act.is_read ? 400 : 600 }}>
+                                                <strong style={{ color: 'var(--color-accent-blue)' }}>{act.user_name}</strong> {act.action.replace(/_/g, ' ')} {act.entity_type} <strong style={{ color: 'var(--color-text-primary)' }}>{act.entity_title}</strong>
+                                            </span>
+                                            {!act.is_read && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6', flexShrink: 0, marginTop: '4px' }}></div>}
+                                        </div>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)' }}>
+                                            {new Date(act.created_at).toLocaleString()}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        
         {/* User Profile Info with Dropdown */}
         <div style={{ position: 'relative' }}>
           <div 
-            onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+            onClick={() => { setIsProfileDropdownOpen(!isProfileDropdownOpen); setIsNotificationOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '1px solid var(--color-border)', cursor: 'pointer' }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>

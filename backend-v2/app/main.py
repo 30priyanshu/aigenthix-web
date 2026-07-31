@@ -17,7 +17,7 @@ from app.middleware.csrf import CSRFMiddleware
 from app.middleware.request_size import RequestSizeLimitMiddleware
 from app.schemas.responses import HealthCheckResponse, ErrorResponse
 
-from app.api import auth, blogs, admin, contact, careers, enrollments, chat, cms, users
+from app.api import auth, blogs, admin, contact, careers, enrollments, chat, cms, users, activity_logs
 
 setup_logging()
 logger = get_logger(__name__)
@@ -82,6 +82,7 @@ app.include_router(enrollments.router)
 app.include_router(chat.router)
 app.include_router(cms.router)
 app.include_router(users.router)
+app.include_router(activity_logs.router)
 
 
 @app.get("/health", response_model=HealthCheckResponse)

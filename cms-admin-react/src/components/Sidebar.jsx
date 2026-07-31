@@ -16,7 +16,7 @@ const Sidebar = () => {
   return (
     <aside className="sidebar" style={{ width: '250px', background: 'var(--color-bg-secondary)', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
-      {user && user.role === 'super_admin' && (
+      {(user && (user.role === 'super_admin' || user.role === 'sub_admin')) && (
         <div>
           <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>Administration</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

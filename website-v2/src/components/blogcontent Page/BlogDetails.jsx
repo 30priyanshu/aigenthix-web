@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Calendar,
@@ -32,13 +32,15 @@ const BlogDetails = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
   const viewIncremented = useRef(false);
 
+  const location = useLocation();
+
   useEffect(() => {
     loadBlog();
     if (slug && !viewIncremented.current) {
       blogService.incrementView(slug);
       viewIncremented.current = true;
     }
-  }, [slug]);
+  }, [slug, location.search]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -48,7 +50,9 @@ const BlogDetails = () => {
   const loadBlog = async () => {
     setLoading(true);
     try {
-      const blog = await blogService.getBlogBySlug(slug);
+      const searchParams = new URLSearchParams(location.search);
+      const isPreview = searchParams.get('preview') === 'true';
+      const blog = await blogService.getBlogBySlug(slug, isPreview);
       setBlog(blog);
       loadRelatedBlogs(blog.category, blog.id);
     } catch (error) {

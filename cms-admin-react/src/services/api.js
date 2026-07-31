@@ -171,3 +171,9 @@ export const UsersApi = {
 export const AuthApi = {
     changePassword: (data) => Api.post('/api/auth/change-password', data, true)
 };
+
+export const ActivitiesApi = {
+    getRecent: () => Api.get('/api/admin/activities', true),
+    markRead: (id) => Api.put(`/api/admin/activities/${id}/read`, {}, true),
+    markAllRead: () => Api.put('/api/admin/activities/read-all', {}, true)
+};

@@ -51,6 +51,7 @@ class BlogService:
             read_time=blog.get("read_time", 0),
             published=blog.get("published", False),
             is_featured=blog.get("is_featured", False),
+            status=blog.get("status", "draft"),
             created_at=blog["created_at"],
             updated_at=blog["updated_at"]
         )
@@ -68,17 +69,20 @@ class BlogService:
             read_time=blog.get("read_time", 0),
             published=blog.get("published", False),
             is_featured=blog.get("is_featured", False),
-            created_at=blog["created_at"]
+            status=blog.get("status", "draft"),
+            created_at=blog["created_at"],
+            updated_at=blog.get("updated_at")
         )
     
-    def get_blog_by_slug(self, slug: str) -> BlogPublic:
-        cache_key = make_cache_key("blog:slug:{slug}", slug=slug)
-        cached = cache_service.get(cache_key)
-        if cached:
-            logger.debug(f"Cache hit for blog slug: {slug}")
-            return BlogPublic(**cached)
+    def get_blog_by_slug(self, slug: str, preview: bool = False) -> BlogPublic:
+        if not preview:
+            cache_key = make_cache_key("blog:slug:{slug}", slug=slug)
+            cached = cache_service.get(cache_key)
+            if cached:
+                logger.debug(f"Cache hit for blog slug: {slug}")
+                return BlogPublic(**cached)
         
-        blog = self.blog_repo.get_by_slug(slug)
+        blog = self.blog_repo.get_by_slug(slug, include_drafts=preview)
         if not blog:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -87,7 +91,8 @@ class BlogService:
         
         blog_public = self._blog_to_public(blog)
         
-        cache_service.set(cache_key, blog_public.model_dump(), ttl=600)
+        if not preview:
+            cache_service.set(cache_key, blog_public.model_dump(), ttl=600)
         
         return blog_public
 

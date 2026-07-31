@@ -27,6 +27,9 @@ class BlogRepository:
             except json.JSONDecodeError:
                 blog["tags"] = []
         
+        if blog.get("status") is None:
+            blog["status"] = "published" if blog.get("published") else "draft"
+            
         return blog
     
     def get_by_id(self, blog_id: int) -> Optional[dict]:
@@ -37,11 +40,11 @@ class BlogRepository:
         blog = self.cursor.fetchone()
         return self._parse_json_fields(blog) if blog else None
     
-    def get_by_slug(self, slug: str) -> Optional[dict]:
-        self.cursor.execute(
-            "SELECT * FROM blogs WHERE slug = %s AND published = TRUE",
-            (slug,)
-        )
+    def get_by_slug(self, slug: str, include_drafts: bool = False) -> Optional[dict]:
+        query = "SELECT * FROM blogs WHERE slug = %s"
+        if not include_drafts:
+            query += " AND published = TRUE"
+        self.cursor.execute(query, (slug,))
         blog = self.cursor.fetchone()
         return self._parse_json_fields(blog) if blog else None
     
@@ -71,7 +74,8 @@ class BlogRepository:
         self.cursor.execute(
             """
             SELECT id, title, slug, excerpt, featured_image_url,
-                   author_name, created_at, tags, category, read_time
+                   author_name, created_at, updated_at, tags, category, read_time,
+                   published, is_featured, status
             FROM blogs
             WHERE published = TRUE AND is_featured = TRUE
             ORDER BY created_at DESC
@@ -85,7 +89,8 @@ class BlogRepository:
         self.cursor.execute(
             """
             SELECT id, title, slug, excerpt, featured_image_url,
-                   author_name, created_at, tags, category, read_time
+                   author_name, created_at, updated_at, tags, category, read_time,
+                   published, is_featured, status
             FROM blogs
             WHERE published = TRUE
             ORDER BY view_count DESC, created_at DESC
@@ -118,11 +123,11 @@ class BlogRepository:
                 faqs,
                 meta_title, meta_description, meta_keywords,
                 cta_text, cta_url, cta_style, cta_position,
-                published, is_featured, read_time
+                published, is_featured, read_time, status
             ) VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
             RETURNING id
         """
@@ -142,7 +147,7 @@ class BlogRepository:
             blog_data.meta_title, blog_data.meta_description, blog_data.meta_keywords,
             blog_data.cta_text, blog_data.cta_url,
             blog_data.cta_style, blog_data.cta_position,
-            blog_data.published, blog_data.is_featured, read_time
+            blog_data.published, blog_data.is_featured, read_time, blog_data.status
         )
         
         self.cursor.execute(query, params)
@@ -169,7 +174,7 @@ class BlogRepository:
                 meta_title = %s, meta_description = %s, meta_keywords = %s,
                 cta_text = %s, cta_url = %s, cta_style = %s,
                 cta_position = %s, published = %s, is_featured = %s,
-                read_time = %s
+                read_time = %s, status = %s
             WHERE id = %s
         """
         
@@ -186,7 +191,7 @@ class BlogRepository:
             blog_data.meta_title, blog_data.meta_description, blog_data.meta_keywords,
             blog_data.cta_text, blog_data.cta_url,
             blog_data.cta_style, blog_data.cta_position,
-            blog_data.published, blog_data.is_featured, read_time, blog_id
+            blog_data.published, blog_data.is_featured, read_time, blog_data.status, blog_id
         )
         
         self.cursor.execute(query, params)
@@ -206,9 +211,10 @@ class BlogRepository:
             return None
         
         new_status = not result["published"]
+        new_status_str = "published" if new_status else "draft"
         self.cursor.execute(
-            "UPDATE blogs SET published = %s WHERE id = %s",
-            (new_status, blog_id)
+            "UPDATE blogs SET published = %s, status = %s WHERE id = %s",
+            (new_status, new_status_str, blog_id)
         )
         return new_status
     
@@ -233,8 +239,9 @@ class BlogRepository:
             return 0
         
         placeholders = ','.join(['%s'] * len(blog_ids))
-        query = f"UPDATE blogs SET published = %s WHERE id IN ({placeholders})"
-        params = (published, *blog_ids)
+        status_str = "published" if published else "draft"
+        query = f"UPDATE blogs SET published = %s, status = %s WHERE id IN ({placeholders})"
+        params = (published, status_str, *blog_ids)
         
         self.cursor.execute(query, params)
         return self.cursor.rowcount

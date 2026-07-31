@@ -257,6 +257,35 @@ CREATE TRIGGER update_users_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 """
 
+ACTIVITY_LOGS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_name VARCHAR(200),
+    action VARCHAR(50) NOT NULL, -- e.g. 'created', 'updated', 'deleted', 'submitted_for_approval', 'approved'
+    entity_type VARCHAR(50) NOT NULL, -- e.g. 'blog', 'product', 'user'
+    entity_id INTEGER,
+    entity_title VARCHAR(500),
+    message TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_unread ON activity_logs(is_read) WHERE is_read = FALSE;
+"""
+
+NEW_COLUMNS_SQL = """
+-- Add created_by to users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by INTEGER REFERENCES users(id) ON DELETE SET NULL;
+
+-- Add status to blogs
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'draft';
+
+-- Add read_by to activity_logs for per-user read tracking
+ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS read_by INTEGER[] DEFAULT '{}';
+"""
+
 PRODUCTS_TRIGGER = """
 DROP TRIGGER IF EXISTS update_products_updated_at ON products;
 CREATE TRIGGER update_products_updated_at
@@ -308,6 +337,8 @@ MIGRATIONS = [
     ("services_trigger", SERVICES_TRIGGER),
     ("industries_trigger", INDUSTRIES_TRIGGER),
     ("rd_trigger", RD_TRIGGER),
+    ("activity_logs", ACTIVITY_LOGS_TABLE_SQL),
+    ("new_columns", NEW_COLUMNS_SQL),
 ]
 
 

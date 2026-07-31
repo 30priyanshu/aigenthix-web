@@ -40,6 +40,7 @@ class AuthService:
         token = security_service.create_access_token({
             "sub": str(user["id"]),
             "email": user["email"],
+            "name": user.get("name") or "Unknown",
             "role": user.get("role", "editor")
         })
         

@@ -20,12 +20,15 @@ const RichTextEditor = ({ value, onChange }) => {
       'superscript', 'subscript', '|',
       'ul', 'ol', '|',
       'outdent', 'indent', '|',
-      'font', 'fontsize', 'brush', 'paragraph', '|',
+      'brush', 'paragraph', '|',
       'image', 'video', 'table', 'link', '|',
       'align', 'undo', 'redo', '|',
       'hr', 'eraser', 'copyformat', '|',
       'symbol', 'fullsize', 'preview', 'print'
     ],
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_clear_html',
     // Jodit automatically converts styling to inline-style CSS
     useSplitMode: false,
     enter: "P",

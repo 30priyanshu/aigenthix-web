@@ -12,17 +12,20 @@ from app.schemas.responses import SuccessResponse
 
 router = APIRouter(prefix="/api/admin/users", tags=["users"])
 
-# Only super admins can manage users
-require_super_admin = RequireRole(["super_admin"])
+# Allow super_admin and sub_admin to manage users
+require_admin = RequireRole(["super_admin", "sub_admin"])
 
 
 @router.get("", response_model=SuccessResponse[List[UserPublic]])
 def list_users(
     cursor: PgCursor = Depends(get_db),
-    current_user: dict = Depends(require_super_admin)
+    current_user: dict = Depends(require_admin)
 ):
     user_repo = UserRepository(cursor)
     users = user_repo.get_all()
+    # If sub_admin, only show users they created and themselves
+    if current_user.get("role") == "sub_admin":
+        users = [u for u in users if str(u.get("created_by")) == str(current_user.get("sub")) or str(u.get("id")) == str(current_user.get("sub"))]
     return SuccessResponse(data=users)
 
 
@@ -30,9 +33,16 @@ def list_users(
 def create_user(
     user_data: UserCreate,
     cursor: PgCursor = Depends(get_db),
-    current_user: dict = Depends(require_super_admin)
+    current_user: dict = Depends(require_admin)
 ):
     user_repo = UserRepository(cursor)
+    
+    # Check permissions
+    if current_user.get("role") == "sub_admin" and user_data.role != "editor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sub admins can only create editors"
+        )
     
     # Check if user already exists
     existing = user_repo.get_by_email(user_data.email)
@@ -47,7 +57,8 @@ def create_user(
         email=user_data.email,
         name=user_data.name,
         password_hash=password_hash,
-        role=user_data.role
+        role=user_data.role,
+        created_by=current_user.get("sub")
     )
     
     if not user_id:
@@ -67,7 +78,7 @@ from app.services.email_service import email_service
 def send_access(
     request: UserSendAccessRequest,
     cursor: PgCursor = Depends(get_db),
-    current_user: dict = Depends(require_super_admin)
+    current_user: dict = Depends(require_admin)
 ):
     user_repo = UserRepository(cursor)
     
@@ -85,7 +96,8 @@ def send_access(
         email=request.email,
         name=request.name,
         password_hash=password_hash,
-        role=request.role
+        role=request.role,
+        created_by=current_user.get("sub")
     )
     
     if not user_id:
@@ -111,7 +123,7 @@ def update_user(
     user_id: int,
     user_data: UserUpdate,
     cursor: PgCursor = Depends(get_db),
-    current_user: dict = Depends(require_super_admin)
+    current_user: dict = Depends(require_admin)
 ):
     user_repo = UserRepository(cursor)
     
@@ -121,6 +133,12 @@ def update_user(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
+        )
+        
+    if current_user.get("role") == "sub_admin" and existing.get("role") != "editor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sub admins can only update editors"
         )
         
     updated = user_repo.update(
@@ -141,7 +159,7 @@ def update_user(
 def delete_user(
     user_id: int,
     cursor: PgCursor = Depends(get_db),
-    current_user: dict = Depends(require_super_admin)
+    current_user: dict = Depends(require_admin)
 ):
     user_repo = UserRepository(cursor)
     
@@ -157,6 +175,12 @@ def delete_user(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
+        )
+        
+    if current_user.get("role") == "sub_admin" and existing.get("role") != "editor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Sub admins can only delete editors"
         )
         
     deleted = user_repo.delete(user_id)

@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str | None = None
     
     RESEND_API_KEY: str | None = None
+    
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = 587
+    SMTP_USER: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_USE_TLS: bool = True
+    
     CONTACT_NOTIFICATION_EMAIL: str | None = None
     CONTACT_FROM_EMAIL: str | None = None
     CMS_FRONTEND_URL: str = "http://localhost:5174/login"

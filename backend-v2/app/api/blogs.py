@@ -24,12 +24,12 @@ def get_blog_page_data(blog_service: BlogService = Depends(get_blog_service)):
 
 
 @router.get("/{slug}", response_model=SuccessResponse[BlogPublic])
-def get_blog_by_slug(slug: str, blog_service: BlogService = Depends(get_blog_service)):
+def get_blog_by_slug(slug: str, preview: bool = False, blog_service: BlogService = Depends(get_blog_service)):
     """
-    Get a single published blog by slug.
-    Cached for 10 minutes.
+    Get a single published blog by slug. If preview=True, can fetch drafts.
+    Cached for 10 minutes (except for previews).
     """
-    blog = blog_service.get_blog_by_slug(slug)
+    blog = blog_service.get_blog_by_slug(slug, preview=preview)
     return SuccessResponse(data=blog)
 
 
