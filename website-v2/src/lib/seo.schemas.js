@@ -39,3 +39,73 @@ export const serviceSchema = ({ name, description, path }) => ({
   areaServed: 'Worldwide',
 });
 
+/**
+ * WebApplication schema for products/software.
+ * @param {{name: string, description: string, path: string, applicationCategory?: string, operatingSystem?: string}} app
+ */
+export const webApplicationSchema = ({ name, description, path, applicationCategory = 'SaaS', operatingSystem = 'All' }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name,
+  url: `${seoConfig.siteUrl}${path}`,
+  description,
+  applicationCategory,
+  operatingSystem,
+  offers: {
+    '@type': 'Offer',
+    availability: 'http://schema.org/InStock',
+    price: '0',
+    priceCurrency: 'INR'
+  }
+});
+
+/**
+ * CollectionPage/Blog schema for listing pages.
+ * @param {{name: string, description: string, path: string}} page
+ */
+export const collectionPageSchema = ({ name, description, path }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name,
+  description,
+  url: `${seoConfig.siteUrl}${path}`,
+  publisher: {
+    '@type': 'Organization',
+    name: 'AiGENThix',
+    logo: { '@type': 'ImageObject', url: `${seoConfig.siteUrl}/faviconlogo.jpeg` }
+  }
+});
+
+/**
+ * Article schema for R&D or general content pages.
+ * @param {{name: string, description: string, path: string, image?: string}} article
+ */
+export const articleSchema = ({ name, description, path, image }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: name,
+  description: description,
+  url: `${seoConfig.siteUrl}${path}`,
+  image: image || seoConfig.defaultImage,
+  author: {
+    '@type': 'Organization',
+    name: 'AiGENThix'
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'AiGENThix',
+    logo: { '@type': 'ImageObject', url: `${seoConfig.siteUrl}/faviconlogo.jpeg` }
+  }
+});
+
+/**
+ * WebPage schema for generic pages like Industries.
+ * @param {{name: string, description: string, path: string}} page
+ */
+export const webPageSchema = ({ name, description, path }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name,
+  description,
+  url: `${seoConfig.siteUrl}${path}`
+});

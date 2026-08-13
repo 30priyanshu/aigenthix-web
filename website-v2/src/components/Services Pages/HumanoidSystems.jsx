@@ -40,7 +40,18 @@ const HumanoidSystems = () => {
         description="Build next-generation humanoid systems with advanced AI, robotics engineering, and real-world adaptability for modern industries."
         url="/services/humanoids"
         image="/humanoid-systems-og.jpg"
-      />
+      structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Humanoid Systems & Robotics Services",
+                    "description": "Build next-generation humanoid systems with advanced AI, robotics engineering, and real-world adaptability for modern industries.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Humanoid Systems & Robotics Services"
+                }}
+            />
 
       <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
         <Navbar />

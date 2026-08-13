@@ -22,6 +22,17 @@ const IoTService = () => {
                 description="Connect devices, data, and intelligence at scale. We build secure, real-time IoT ecosystems that enable smarter operations, automation, and predictive insights."
                 url="/services/iot"
                 image="/iot-og.jpg"
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Internet of Things (IoT) Solutions",
+                    "description": "Connect devices, data, and intelligence at scale. We build secure, real-time IoT ecosystems that enable smarter operations, automation, and predictive insights.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Internet of Things (IoT) Solutions"
+                }}
             />
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
                 <Navbar />

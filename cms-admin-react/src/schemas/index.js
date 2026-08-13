@@ -11,31 +11,40 @@ export const SCHEMAS = {
             { name: 'category', label: 'Category', type: 'text', required: true },
             { name: 'tags', label: 'Tags (comma separated)', type: 'text', required: false },
             { name: 'excerpt', label: 'Excerpt', type: 'textarea', required: false },
-            { name: 'featured_image_url', label: 'Featured Image', type: 'text', required: false },
+            { name: 'featured_image_url', label: 'Featured Image URL', type: 'image', required: true },
+            { name: 'featured_image_alt', label: 'Featured Image Alt Text (Required for SEO)', type: 'text', required: true },
             { name: 'content', label: 'Content', type: 'richtext', required: true },
             
             // Author Fields
-            { name: 'author_name', label: 'Author Name', type: 'text', required: true },
-            { name: 'author_title', label: 'Author Title (e.g. Lead Developer)', type: 'text', required: false },
-            { name: 'author_avatar_url', label: 'Author Avatar URL', type: 'text', required: false },
-            { name: 'author_bio', label: 'Author Bio', type: 'textarea', required: false },
-            { name: 'author_twitter', label: 'Author Twitter URL', type: 'text', required: false },
-            { name: 'author_linkedin', label: 'Author LinkedIn URL', type: 'text', required: false },
+            { name: 'author_id', label: 'Select Main Author', type: 'author_single_select', required: true },
+            { name: 'author_ids', label: 'Select Contributors', type: 'authors_multi_select', required: false },
             
             // Fact Checker Fields
-            { name: 'fact_checker_name', label: 'Fact Checker Name', type: 'text', required: false },
-            { name: 'fact_checker_avatar_url', label: 'Fact Checker Avatar URL', type: 'text', required: false },
-            { name: 'fact_checker_bio', label: 'Fact Checker Bio (Description)', type: 'textarea', required: false },
+            { name: 'fact_checker_ids', label: 'Select Fact Checkers', type: 'fact_checkers_multi_select', required: false },
             
             // FAQs
             { name: 'faqs', label: 'Frequently Asked Questions', type: 'faq_list', required: false },
             
             // SEO & CTA
             { name: 'read_time', label: 'Read Time (mins)', type: 'number', required: false },
+            { name: 'schema_type', label: 'Schema Type', type: 'schema_select', required: false },
+            { name: 'show_toc', label: 'Show Table of Contents', type: 'toggle', required: false },
             { name: 'meta_title', label: 'Meta Title', type: 'text', required: false },
             { name: 'meta_description', label: 'Meta Description', type: 'textarea', required: false },
             { name: 'cta_text', label: 'CTA Button Text', type: 'text', required: false },
-            { name: 'cta_url', label: 'CTA URL', type: 'text', required: false }
+            { name: 'cta_url', label: 'CTA URL', type: 'text', required: false },
+            { 
+                name: 'ad_category', 
+                label: 'Advertisement Category', 
+                type: 'select', 
+                options: [
+                    { value: '', label: 'None' },
+                    { value: 'products', label: 'Aigenthix Products' },
+                    { value: 'services', label: 'Consulting Services' },
+                    { value: 'courses', label: 'Training & Courses' }
+                ],
+                required: false 
+            }
         ]
     },
     products: {

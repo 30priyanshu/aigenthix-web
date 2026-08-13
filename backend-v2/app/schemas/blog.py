@@ -11,7 +11,14 @@ class BlogBase(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     tags: List[str] = Field(default_factory=list)
     featured_image_url: Optional[str] = Field(None)
+    featured_image_alt: Optional[str] = Field(None, max_length=500)
     
+    schema_type: Optional[str] = Field("Article", max_length=50)
+    canonical_url: Optional[str] = Field(None, max_length=1000)
+    show_toc: bool = False
+    
+    author_id: Optional[int] = Field(None)
+    author_ids: Optional[List[int]] = Field(default_factory=list)
     author_name: Optional[str] = Field(None, max_length=200)
     author_title: Optional[str] = Field(None, max_length=200)
     author_bio: Optional[str] = Field(None, max_length=1000)
@@ -26,6 +33,7 @@ class BlogBase(BaseModel):
     fact_checker_name: Optional[str] = Field(None, max_length=200)
     fact_checker_bio: Optional[str] = Field(None, max_length=1000)
     fact_checker_avatar_url: Optional[str] = Field(None, max_length=500)
+    fact_checker_ids: Optional[List[int]] = Field(default_factory=list)
     
     faqs: Optional[List[dict]] = Field(default_factory=list)
     
@@ -37,6 +45,8 @@ class BlogBase(BaseModel):
     cta_url: Optional[str] = Field(None, max_length=500)
     cta_style: Optional[str] = Field("primary", max_length=50)
     cta_position: Optional[str] = Field("bottom", max_length=50)
+    
+    ad_category: Optional[str] = Field(None, max_length=100)
     
     published: bool = False
     is_featured: bool = False
@@ -92,6 +102,13 @@ class BlogPublic(BaseModel):
     category: Optional[str]
     tags: List[str]
     featured_image_url: Optional[str]
+    featured_image_alt: Optional[str] = None
+    schema_type: Optional[str] = "Article"
+    canonical_url: Optional[str] = None
+    show_toc: bool = False
+    author_id: Optional[int] = None
+    author_ids: Optional[List[int]] = Field(default_factory=list)
+    authors_data: Optional[List[dict]] = Field(default_factory=list)
     author_name: Optional[str]
     author_title: Optional[str]
     author_bio: Optional[str]
@@ -105,6 +122,8 @@ class BlogPublic(BaseModel):
     fact_checker_name: Optional[str] = None
     fact_checker_bio: Optional[str] = None
     fact_checker_avatar_url: Optional[str] = None
+    fact_checker_ids: Optional[List[int]] = Field(default_factory=list)
+    fact_checkers_data: Optional[List[dict]] = Field(default_factory=list)
     faqs: Optional[List[dict]] = None
     meta_title: Optional[str]
     meta_description: Optional[str]
@@ -113,6 +132,7 @@ class BlogPublic(BaseModel):
     cta_url: Optional[str]
     cta_style: Optional[str]
     cta_position: Optional[str]
+    ad_category: Optional[str] = None
     read_time: int
     published: bool
     is_featured: bool
@@ -129,7 +149,11 @@ class BlogListItem(BaseModel):
     category: Optional[str]
     tags: List[str]
     featured_image_url: Optional[str]
+    authors_data: Optional[List[dict]] = Field(default_factory=list)
     author_name: Optional[str]
+    fact_checker_ids: Optional[List[int]] = Field(default_factory=list)
+    fact_checkers_data: Optional[List[dict]] = Field(default_factory=list)
+    ad_category: Optional[str] = None
     read_time: int
     published: bool
     is_featured: bool

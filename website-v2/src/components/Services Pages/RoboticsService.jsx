@@ -51,7 +51,18 @@ const RoboticsService = () => {
         description="Transform industries with intelligent robotics systems. From automation to autonomous machines, we engineer the future of robotics."
         url="/services/robotics"
         image="/robotics-og.jpg"
-      />
+      structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Robotics Solutions for Smart Automation Services",
+                    "description": "Transform industries with intelligent robotics systems. From automation to autonomous machines, we engineer the future of robotics.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Robotics Solutions for Smart Automation Services"
+                }}
+            />
       <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
         <Navbar />
 

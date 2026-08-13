@@ -52,7 +52,18 @@ const CybersecurityService = () => {
         description="Protect your business with advanced cybersecurity systems. From threat detection to enterprise compliance, we secure your digital future."
         url="/services/cybersecurity"
         image="/cybersecurity-og.jpg"
-      />
+      structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Cybersecurity Services",
+                    "description": "Protect your business with advanced cybersecurity systems. From threat detection to enterprise compliance, we secure your digital future.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Cybersecurity Services"
+                }}
+            />
       <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
         <Navbar />
 

@@ -126,6 +126,11 @@ const GenericList = () => {
               <div>
                 <h3 className="title font-bold">{item.title || item.name || item.project_name}</h3>
                 <p className="meta">{item.slug}</p>
+                {item.authors_data && item.authors_data.length > 0 && (
+                  <p className="meta" style={{ marginTop: '4px', color: '#4b5563', fontWeight: '500' }}>
+                    <span style={{opacity: 0.7}}>Authors:</span> {item.authors_data.map(a => a.name).join(', ')}
+                  </p>
+                )}
                 {(item.created_at || item.date) && (
                   <p className="meta" style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>

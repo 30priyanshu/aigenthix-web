@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cmsService } from '../services/cmsService';
 import SEO from './SEO';
+import { webApplicationSchema, serviceSchema, breadcrumbSchema, webPageSchema, articleSchema } from '../lib/seo.schemas';
 import LiteYouTube from "./LiteYouTube";
 import { FaFileAlt, FaBrain, FaCamera, FaChartBar, FaBullseye, FaChalkboardTeacher, FaCheckCircle } from 'react-icons/fa';
 
@@ -256,7 +257,8 @@ const DynamicPage = ({ type }) => {
         if (type === 'rd') items = await cmsService.getRDs();
 
         const match = items.find(i => i.slug === slug);
-        if (match && (match.status === 'published' || match.is_published)) {
+        const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+        if (match && (match.status === 'published' || match.is_published || isPreview)) {
           if (typeof match.content_data === 'string') {
              try { match.content_data = JSON.parse(match.content_data); } catch(e) {}
           }
@@ -287,14 +289,55 @@ const DynamicPage = ({ type }) => {
   const title = data.title || data.name || data.project_name;
   const description = data.description || data.summary;
   const imageUrl = data.image_url || data.icon_url || data.hero_image_url;
+  const path = `/${type}/${slug}`;
+
+  // Generate appropriate schemas based on page type
+  const breadcrumb = breadcrumbSchema([
+    { name: type.charAt(0).toUpperCase() + type.slice(1), path: `/${type}` },
+    { name: title, path: path }
+  ]);
+
+  let typeSpecificSchema = null;
+  if (type === 'products') {
+    typeSpecificSchema = webApplicationSchema({
+      name: title,
+      description: description,
+      path: path
+    });
+  } else if (type === 'services') {
+    typeSpecificSchema = serviceSchema({
+      name: title,
+      description: description,
+      path: path
+    });
+  } else if (type === 'industries') {
+    typeSpecificSchema = webPageSchema({
+      name: title,
+      description: description,
+      path: path
+    });
+  } else if (type === 'rd') {
+    typeSpecificSchema = articleSchema({
+      name: title,
+      description: description,
+      path: path,
+      image: imageUrl
+    });
+  }
+
+  const structuredData = [breadcrumb];
+  if (typeSpecificSchema) {
+    structuredData.push(typeSpecificSchema);
+  }
 
   return (
     <>
       <SEO
         title={`${title} - AiGENThix`}
         description={description}
-        url={`/${type}/${slug}`}
+        url={path}
         image={imageUrl}
+        structuredData={structuredData}
       />
       {type === 'products' && <ProductTemplate data={data} />}
       {type === 'services' && <ServiceTemplate data={data} />}

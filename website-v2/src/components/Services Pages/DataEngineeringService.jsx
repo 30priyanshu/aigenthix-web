@@ -24,6 +24,17 @@ const DataEngineeringService = () => {
                 url="/services/data-engineering"
                 image="/data-engineering-og.jpg"
 
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Data Engineering Services ",
+                    "description": "Build scalable, reliable, and high-performance data platforms. We transform raw data into trusted insights that drive AI, automation, and business growth.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Data Engineering Services "
+                }}
             />
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
                 <Navbar />

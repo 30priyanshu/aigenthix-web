@@ -16,10 +16,17 @@ CREATE TABLE IF NOT EXISTS blogs (
     category VARCHAR(100),
     tags JSONB DEFAULT '[]'::jsonb,
     
+    -- SEO & Technical
+    schema_type VARCHAR(50) DEFAULT 'Article',
+    canonical_url VARCHAR(1000),
+    show_toc BOOLEAN DEFAULT FALSE,
+    
     -- Featured image
     featured_image_url TEXT,
+    featured_image_alt TEXT,
     
     -- Author information
+    author_id INTEGER, -- References authors table if used
     author_name VARCHAR(200),
     author_bio TEXT,
     author_avatar_url TEXT,
@@ -284,6 +291,59 @@ ALTER TABLE blogs ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'draft';
 
 -- Add read_by to activity_logs for per-user read tracking
 ALTER TABLE activity_logs ADD COLUMN IF NOT EXISTS read_by INTEGER[] DEFAULT '{}';
+
+-- Add new columns to blogs for SEO
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS featured_image_alt TEXT;
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS schema_type VARCHAR(50) DEFAULT 'Article';
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS canonical_url VARCHAR(1000);
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS show_toc BOOLEAN DEFAULT FALSE;
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS author_id INTEGER;
+ALTER TABLE blogs ADD COLUMN IF NOT EXISTS author_ids JSONB DEFAULT '[]'::jsonb;
+"""
+
+AUTHORS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS authors (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    bio TEXT,
+    avatar_url TEXT,
+    twitter VARCHAR(200),
+    linkedin VARCHAR(200),
+    facebook VARCHAR(200),
+    instagram VARCHAR(200),
+    github VARCHAR(200),
+    website VARCHAR(500),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+AUTHORS_TRIGGER = """
+DROP TRIGGER IF EXISTS update_authors_updated_at ON authors;
+CREATE TRIGGER update_authors_updated_at
+    BEFORE UPDATE ON authors
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+"""
+
+REDIRECTS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS redirects (
+    id SERIAL PRIMARY KEY,
+    old_slug VARCHAR(500) NOT NULL UNIQUE,
+    new_slug VARCHAR(500) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_redirects_old_slug ON redirects(old_slug);
+"""
+
+SETTINGS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS settings (
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(100) NOT NULL UNIQUE,
+    value TEXT NOT NULL,
+    description TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 PRODUCTS_TRIGGER = """
@@ -338,6 +398,10 @@ MIGRATIONS = [
     ("industries_trigger", INDUSTRIES_TRIGGER),
     ("rd_trigger", RD_TRIGGER),
     ("activity_logs", ACTIVITY_LOGS_TABLE_SQL),
+    ("authors", AUTHORS_TABLE_SQL),
+    ("authors_trigger", AUTHORS_TRIGGER),
+    ("redirects", REDIRECTS_TABLE_SQL),
+    ("settings", SETTINGS_TABLE_SQL),
     ("new_columns", NEW_COLUMNS_SQL),
 ]
 

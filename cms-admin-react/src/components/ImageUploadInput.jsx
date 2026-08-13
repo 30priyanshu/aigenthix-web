@@ -1,9 +1,19 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Link as LinkIcon, Image as ImageIcon, X } from 'lucide-react';
+import { UploadCloud, Link as LinkIcon, Image as ImageIcon, X, Loader } from 'lucide-react';
+import { Auth } from '../services/auth';
+import { CMS_CONFIG } from '../services/config';
+import ImageCropperModal from './ImageCropperModal';
 
-const ImageUploadInput = ({ name, value, onChange, label, required }) => {
+const ImageUploadInput = ({ name, value, onChange, label, required, enableCrop = false, cropAspectRatio = 1 }) => {
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'url'
   const [dragActive, setDragActive] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Cropper state
+  const [showCropper, setShowCropper] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState(null);
+  const [originalFileParams, setOriginalFileParams] = useState(null);
+
   const inputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -22,34 +32,81 @@ const ImageUploadInput = ({ name, value, onChange, label, required }) => {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+      processFileSelection(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
+      processFileSelection(e.target.files[0]);
     }
   };
 
-  const handleFile = (file) => {
+  const processFileSelection = (file) => {
     if (!file.type.startsWith('image/')) {
       alert('Please upload an image file');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      // Simulate an event for onChange
+    if (enableCrop) {
+      // Read file to show in cropper
+      const reader = new FileReader();
+      reader.onload = () => {
+        setTempImageSrc(reader.result);
+        setOriginalFileParams({ type: file.type, name: file.name });
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      handleFile(file);
+    }
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    setShowCropper(false);
+    setTempImageSrc(null);
+    
+    // Convert blob to File object to maintain compatibility with upload service
+    const file = new File([croppedBlob], originalFileParams.name || 'cropped_image.jpg', {
+      type: originalFileParams.type || 'image/jpeg',
+    });
+    
+    await handleFile(file);
+  };
+
+  const handleFile = async (file) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const token = Auth.getToken();
+      const response = await fetch(`${CMS_CONFIG.API_URL}/api/admin/upload/image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.detail || result.message || 'Upload failed');
+      }
+
       onChange({
         target: {
           name: name,
-          value: reader.result,
+          value: result.data.url,
           type: 'text'
         }
       });
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Image upload error:", error);
+      alert(error.message || "Failed to upload image.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const clearImage = () => {
@@ -138,19 +195,30 @@ const ImageUploadInput = ({ name, value, onChange, label, required }) => {
                     textAlign: 'center',
                     backgroundColor: dragActive ? 'rgba(59, 130, 246, 0.05)' : 'transparent',
                     transition: 'all 0.2s ease',
-                    cursor: 'pointer'
+                    cursor: isUploading ? 'not-allowed' : 'pointer',
+                    opacity: isUploading ? 0.7 : 1
                   }}
-                  onClick={() => inputRef.current?.click()}
+                  onClick={() => { if(!isUploading) inputRef.current?.click(); }}
                 >
-                  <ImageIcon size={48} style={{ color: 'var(--color-text-muted)', margin: '0 auto 1rem' }} />
-                  <p style={{ fontWeight: '500', marginBottom: '0.5rem' }}>Drag & drop your image here</p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>or click to browse your files</p>
+                  {isUploading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                      <Loader size={36} className="animate-spin" style={{ color: 'var(--color-accent-blue)', margin: '0 auto' }} />
+                      <p style={{ fontWeight: '500', color: 'var(--color-text-main)' }}>Uploading...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <ImageIcon size={48} style={{ color: 'var(--color-text-muted)', margin: '0 auto 1rem' }} />
+                      <p style={{ fontWeight: '500', marginBottom: '0.5rem' }}>Drag & drop your image here</p>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>or click to browse your files</p>
+                    </>
+                  )}
                   <input
                     ref={inputRef}
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
                     style={{ display: 'none' }}
+                    disabled={isUploading}
                   />
                 </div>
               )}
@@ -171,6 +239,18 @@ const ImageUploadInput = ({ name, value, onChange, label, required }) => {
           )}
         </div>
       </div>
+      
+      {showCropper && tempImageSrc && (
+        <ImageCropperModal
+          imageSrc={tempImageSrc}
+          onCropComplete={handleCropComplete}
+          onCancel={() => {
+            setShowCropper(false);
+            setTempImageSrc(null);
+          }}
+          aspectRatio={cropAspectRatio}
+        />
+      )}
     </div>
   );
 };

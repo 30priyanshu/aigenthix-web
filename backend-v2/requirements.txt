@@ -13,4 +13,5 @@ psycopg2-binary
 slowapi
 resend
 pydantic[email]
-google-genai
+google-genaiPillow==10.2.0
+Pillow

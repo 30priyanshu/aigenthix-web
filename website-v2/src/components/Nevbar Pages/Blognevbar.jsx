@@ -5,7 +5,7 @@ import { formatDate } from "../../utils/date";
 import { optimizeImage } from "../../utils/image";
 import { truncateText } from "../../utils/text";
 import SEO from "../SEO";
-import { breadcrumbSchema } from "../../lib/seo.schemas";
+import { breadcrumbSchema, collectionPageSchema } from "../../lib/seo.schemas";
 
 const BlogPage = () => {
   const [pageData, setPageData] = useState({
@@ -74,13 +74,20 @@ const BlogPage = () => {
     );
   }
 
+  const blogBreadcrumb = breadcrumbSchema([{ name: 'Blog', path: '/blog' }]);
+  const blogCollectionSchema = collectionPageSchema({
+    name: "AI Blog - Insights on Generative AI, ML & Technology - AiGENThix",
+    description: "Read the latest insights on Artificial Intelligence, Generative AI, Machine Learning, Robotics, and enterprise technology from AiGENThix experts.",
+    path: "/blog"
+  });
+
   return (
     <div className="bg-white font-sans text-gray-800">
       <SEO
         title="AI Blog - Insights on Generative AI, ML & Technology - AiGENThix"
         description="Read the latest insights on Artificial Intelligence, Generative AI, Machine Learning, Robotics, and enterprise technology from AiGENThix experts."
         keywords="AI blog, artificial intelligence articles, generative AI insights, machine learning blog, technology trends, AiGENThix blog"
-        structuredData={breadcrumbSchema([{ name: 'Blog', path: '/blog' }])}
+        structuredData={[blogBreadcrumb, blogCollectionSchema]}
       />
       {/* HERO SECTION */}
       <section
@@ -119,7 +126,12 @@ const BlogPage = () => {
                   <p className="text-sm text-blue-600 font-semibold">FEATURED</p>
                   <span className="text-gray-400">•</span>
                   <p className="text-sm text-gray-600">{formatDate(pageData.featured.created_at)}</p>
-                  {pageData.featured.author_name && (
+                  {pageData.featured.authors_data && pageData.featured.authors_data.length > 0 ? (
+                    <>
+                      <span className="text-gray-400">•</span>
+                      <p className="text-sm text-gray-600">{pageData.featured.authors_data.map(a => a.name).join(', ')}</p>
+                    </>
+                  ) : pageData.featured.author_name && (
                     <>
                       <span className="text-gray-400">•</span>
                       <p className="text-sm text-gray-600">{pageData.featured.author_name}</p>
@@ -198,7 +210,12 @@ const BlogPage = () => {
                   <div className="p-6">
                     <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-3">
                       <span>{formatDate(post.created_at)}</span>
-                      {post.author_name && (
+                      {post.authors_data && post.authors_data.length > 0 ? (
+                        <>
+                          <span>•</span>
+                          <span>{post.authors_data.map(a => a.name).join(', ')}</span>
+                        </>
+                      ) : post.author_name && (
                         <>
                           <span>•</span>
                           <span>{post.author_name}</span>

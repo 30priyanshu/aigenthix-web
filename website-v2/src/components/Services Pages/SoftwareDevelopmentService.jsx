@@ -22,6 +22,17 @@ const SoftwareDevelopmentService = () => {
                 description="Learn about AiGenthix — our mission, vision, AI research, ethical approach, and how we help businesses grow using cutting-edge artificial intelligence."
                 url="/services/software-development"
                 image="/software-development-og.jpg"
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Software Development Services",
+                    "description": "Learn about AiGenthix — our mission, vision, AI research, ethical approach, and how we help businesses grow using cutting-edge artificial intelligence.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Software Development Services"
+                }}
             />
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
                 <Navbar />

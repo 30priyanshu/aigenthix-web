@@ -53,6 +53,32 @@ const Sidebar = () => {
           ))}
         </ul>
       </div>
+      
+      <div>
+        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--color-text-primary)' }}>Contributors</h3>
+        <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <li>
+            <NavLink
+              to="/admin/authors"
+              className={({ isActive }) => `btn btn-ghost ${isActive ? 'active' : ''}`}
+              style={{ width: '100%', justifyContent: 'flex-start' }}
+            >
+              <Users size={18} style={{ marginRight: '8px' }} />
+              Authors
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/admin/factcheckers"
+              className={({ isActive }) => `btn btn-ghost ${isActive ? 'active' : ''}`}
+              style={{ width: '100%', justifyContent: 'flex-start' }}
+            >
+              <Users size={18} style={{ marginRight: '8px' }} />
+              Fact Checkers
+            </NavLink>
+          </li>
+        </ul>
+      </div>
     </aside>
   );
 };

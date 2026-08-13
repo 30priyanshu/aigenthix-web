@@ -87,15 +87,28 @@ class UploadService:
             )
         
         try:
-            await file.seek(0)
+            from PIL import Image
+            import io
+            
+            # Open image with Pillow
+            img = Image.open(io.BytesIO(file_content))
+            
+            # Convert RGBA to RGB if saving as WebP/JPEG (WebP supports RGBA but just in case for consistency)
+            # Actually WebP supports alpha channel, so we can keep it.
+            
+            output_io = io.BytesIO()
+            # Compress and convert to webp
+            img.save(output_io, format="WEBP", quality=85, method=6)
+            output_io.seek(0)
             
             result = cloudinary.uploader.upload(
-                file.file,
+                output_io,
                 folder="aigenthix/blogs",
-                resource_type="auto"
+                resource_type="image",
+                format="webp"
             )
             
-            logger.info(f"Image uploaded: {result.get('public_id')}")
+            logger.info(f"Image uploaded and optimized: {result.get('public_id')}")
             
             return result["secure_url"]
         except Exception as e:

@@ -57,12 +57,33 @@ const BlogCard = ({ post }) => {
                     {/* Footer (Author and Read More) */}
                     <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-auto">
                         <div className="flex items-center">
-                            <img
-                                src={post.author_avatar_url || `https://ui-avatars.com/api/?name=${post.author_name || 'Admin'}&background=059669&color=fff&size=40`}
-                                alt={post.author_name}
-                                className="w-10 h-10 rounded-full object-cover mr-3 border-2 border-blue-100"
-                            />
-                            <span className="text-sm font-semibold text-gray-700 truncate w-24">{post.author_name || 'Admin'}</span>
+                            {post.authors_data && post.authors_data.length > 0 ? (
+                                <>
+                                    <div className="flex -space-x-2 mr-2">
+                                        {post.authors_data.slice(0, 3).map((author, i) => (
+                                            <img
+                                                key={i}
+                                                src={author.avatar_url || `https://ui-avatars.com/api/?name=${author.name}&background=059669&color=fff&size=40`}
+                                                alt={author.name}
+                                                className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm relative"
+                                                style={{ zIndex: 3 - i }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-sm font-semibold text-gray-700 truncate w-24" title={post.authors_data.map(a => a.name).join(', ')}>
+                                        {post.authors_data.length === 1 ? post.authors_data[0].name : `${post.authors_data[0].name} +${post.authors_data.length - 1}`}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <img
+                                        src={post.author_avatar_url || `https://ui-avatars.com/api/?name=${post.author_name || 'Admin'}&background=059669&color=fff&size=40`}
+                                        alt={post.author_name}
+                                        className="w-10 h-10 rounded-full object-cover mr-3 border-2 border-blue-100"
+                                    />
+                                    <span className="text-sm font-semibold text-gray-700 truncate w-24">{post.author_name || 'Admin'}</span>
+                                </>
+                            )}
                         </div>
 
                         {/* Read More Link */}

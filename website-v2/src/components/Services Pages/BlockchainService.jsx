@@ -64,7 +64,18 @@ const BlockchainService = () => {
         description="Unlock secure, transparent, and decentralized innovation with blockchain technology. From smart contracts to enterprise solutions, we help businesses lead the digital revolution."
         url="/services/blockchain"
         image="/blockchain-og.jpg"
-      />
+      structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Blockchain Technology for the Future Services",
+                    "description": "Unlock secure, transparent, and decentralized innovation with blockchain technology. From smart contracts to enterprise solutions, we help businesses lead the digital revolution.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Blockchain Technology for the Future Services"
+                }}
+            />
       <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
         <Navbar />
 

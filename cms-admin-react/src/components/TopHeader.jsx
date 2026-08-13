@@ -60,8 +60,9 @@ const TopHeader = ({ title = 'CMS', onRefresh }) => {
       return;
     }
     
-    if (passwordForm.new_password.length < 6) {
-      setPasswordError('New password must be at least 6 characters');
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!strongPasswordRegex.test(passwordForm.new_password)) {
+      setPasswordError('Password must be at least 8 characters, include uppercase, lowercase, number, and a special character (@$!%*?&).');
       return;
     }
     
@@ -208,6 +209,9 @@ const TopHeader = ({ title = 'CMS', onRefresh }) => {
               <button type="button" onClick={() => setShowPasswords(!showPasswords)} style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>
                 {showPasswords ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.5rem', marginBottom: 0, lineHeight: 1.4 }}>
+                Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character.
+              </p>
             </div>
             
             <div className="form-group" style={{ position: 'relative' }}>

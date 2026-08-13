@@ -26,13 +26,13 @@ const Landing = () => {
       {/* Hero Section */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4rem 2rem', textAlign: 'center' }}>
         <div style={{ display: 'inline-block', padding: '0.25rem 1rem', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-accent-blue)', borderRadius: '9999px', fontSize: '0.875rem', fontWeight: '600', marginBottom: '2rem' }}>
-          ✨ Version 2.0 Now Available
+          Welcome To AiGENThix CMS
         </div>
-        
+
         <h1 style={{ fontSize: '4rem', fontWeight: '800', lineHeight: '1.2', marginBottom: '1.5rem', maxWidth: '800px', letterSpacing: '-0.02em' }}>
           Manage your content with <span style={{ color: 'var(--color-accent-blue)' }}>unmatched elegance</span>
         </h1>
-        
+
         <p style={{ fontSize: '1.25rem', color: 'var(--color-text-secondary)', marginBottom: '3rem', maxWidth: '600px', lineHeight: '1.6' }}>
           A premium, professional, and lightning-fast headless CMS designed for modern teams. Take control of your websites and applications with ease.
         </p>
@@ -68,7 +68,7 @@ const Landing = () => {
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>Secure & Fast</h3>
               <p style={{ color: 'var(--color-text-secondary)' }}>Built on modern web technologies ensuring your data is safe and fast.</p>
             </div>
-             <div className="card card-hover" style={{ padding: '2rem' }}>
+            <div className="card card-hover" style={{ padding: '2rem' }}>
               <LayoutDashboard size={32} style={{ color: 'var(--color-accent-yellow)', marginBottom: '1rem' }} />
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>Beautiful UI</h3>
               <p style={{ color: 'var(--color-text-secondary)' }}>A light, refreshing theme that looks professional and clean.</p>

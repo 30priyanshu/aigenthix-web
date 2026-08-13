@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaGlobe, FaGithub } from "react-icons/fa";
 import { blogService } from "../../services/blogService";
+import { cmsService } from "../../services/cmsService";
 import { sanitizeHtml, escapeHtml } from "../../utils/security";
 import { formatDate } from "../../utils/date";
 import { optimizeImage } from "../../utils/image";
@@ -30,7 +31,11 @@ const BlogDetails = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const [adItems, setAdItems] = useState([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [sidebarTop, setSidebarTop] = useState(128);
   const viewIncremented = useRef(false);
+  const sidebarRef = useRef(null);
 
   const location = useLocation();
 
@@ -46,6 +51,75 @@ const BlogDetails = () => {
     window.scrollTo(0, 0);
     return () => { viewIncremented.current = false; };
   }, [slug]);
+
+  useEffect(() => {
+    const fetchAdItems = async () => {
+      if (!blog || !blog.ad_category || blog.ad_category === '') return;
+      
+      let items = [];
+      try {
+        if (blog.ad_category === 'products') {
+          items = await cmsService.getProducts();
+        } else if (blog.ad_category === 'services') {
+          items = await cmsService.getServices();
+        } else if (blog.ad_category === 'courses') {
+          items = [
+             { title: 'Agentic AI Masterclass', description: 'Become an expert in agentic AI. Join our comprehensive training programs and upskill your team.', image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80', slug: 'agentic-ai' }
+          ];
+        }
+        
+        const validItems = items.filter(i => i.title && i.slug);
+        
+        for (let i = validItems.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [validItems[i], validItems[j]] = [validItems[j], validItems[i]];
+        }
+        
+        setAdItems(validItems);
+      } catch (err) {
+        console.error("Failed to fetch ad items", err);
+      }
+    };
+    
+    fetchAdItems();
+  }, [blog?.ad_category]);
+
+  useEffect(() => {
+    if (adItems.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentAdIndex(prev => (prev + 1) % adItems.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [adItems]);
+
+  useEffect(() => {
+    // Dynamically calculate the top position so tall sidebars stick to the bottom of the screen
+    // without requiring an independent scrollbar.
+    const handleResize = () => {
+      if (sidebarRef.current) {
+        const sidebarHeight = sidebarRef.current.offsetHeight;
+        const windowHeight = window.innerHeight;
+        
+        if (sidebarHeight > windowHeight - 128) {
+          // If sidebar is taller than available window height, stick it such that its bottom aligns with the screen bottom
+          setSidebarTop(windowHeight - sidebarHeight - 32); 
+        } else {
+          // Otherwise, stick it to the top (128px is for header offset)
+          setSidebarTop(128); 
+        }
+      }
+    };
+
+    // Need a small timeout to ensure DOM is fully rendered before calculating height
+    const timeoutId = setTimeout(handleResize, 100);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [blog, adItems, relatedBlogs]);
 
   const loadBlog = async () => {
     setLoading(true);
@@ -273,6 +347,86 @@ const BlogDetails = () => {
     );
   };
 
+  const renderAdvertisement = () => {
+    if (!blog.ad_category || adItems.length === 0) return null;
+
+    const currentItem = adItems[currentAdIndex];
+    if (!currentItem) return null;
+
+    const configs = {
+      products: {
+        badge: "Featured Product",
+        linkPrefix: "/products/",
+        bgClass: "bg-gradient-to-br from-blue-900 to-indigo-900",
+        btnClass: "bg-white text-blue-900 hover:bg-gray-100",
+        fallbackImg: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=80"
+      },
+      services: {
+        badge: "Top Service",
+        linkPrefix: "/services/",
+        bgClass: "bg-gradient-to-br from-emerald-800 to-teal-900",
+        btnClass: "bg-white text-teal-900 hover:bg-gray-100",
+        fallbackImg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
+      },
+      courses: {
+        badge: "Popular Course",
+        linkPrefix: "/enrollment",
+        bgClass: "bg-gradient-to-br from-purple-800 to-fuchsia-900",
+        btnClass: "bg-white text-purple-900 hover:bg-gray-100",
+        fallbackImg: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80"
+      }
+    };
+
+    const config = configs[blog.ad_category] || configs.products;
+    const itemImage = currentItem.image_url || currentItem.hero_image_url || currentItem.icon_url || config.fallbackImg;
+
+    return (
+      <div className={`relative overflow-hidden rounded-2xl shadow-xl ${config.bgClass} text-white group transition-transform duration-500 hover:-translate-y-2 mt-8`}>
+        <div className="absolute inset-0 z-0">
+          <div 
+             className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] transform scale-100 group-hover:scale-110 opacity-30" 
+             style={{ backgroundImage: `url(${itemImage})` }} 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+        </div>
+
+        <div className="relative z-10 p-6 sm:p-8 min-h-[350px] flex flex-col justify-end transition-opacity duration-500" key={currentAdIndex}>
+          <div className="absolute top-6 left-6">
+             <span className="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
+                {config.badge}
+             </span>
+          </div>
+
+          <h3 className="text-2xl font-bold mb-3 leading-tight drop-shadow-md">
+            {currentItem.title}
+          </h3>
+          
+          <p className="text-gray-200 text-sm mb-6 leading-relaxed line-clamp-3 drop-shadow-sm">
+            {currentItem.description || currentItem.excerpt || "Discover how our AI solutions can transform your business processes and unlock new growth opportunities."}
+          </p>
+          
+          <Link to={`${config.linkPrefix}${blog.ad_category === 'courses' ? '' : currentItem.slug || ''}`} className="inline-block w-full">
+            <button className={`w-full py-3 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl transform group-hover:scale-[1.03] flex items-center justify-center gap-2 ${config.btnClass}`}>
+              Learn More <ExternalLink size={16} />
+            </button>
+          </Link>
+
+          {adItems.length > 1 && (
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-20">
+              {adItems.map((_, idx) => (
+                <div 
+                  key={idx} 
+                  className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentAdIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/40 cursor-pointer'}`}
+                  onClick={() => setCurrentAdIndex(idx)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
@@ -335,9 +489,9 @@ const BlogDetails = () => {
 
   const articleSchema = blog ? {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: blog.title,
-    description: blog.excerpt || blog.content?.substring(0, 160),
+    '@type': blog.schema_type || 'BlogPosting',
+    headline: blog.meta_title || blog.title,
+    description: blog.meta_description || blog.excerpt || blog.content?.substring(0, 160),
     image: blog.featured_image_url || seoConfig.defaultImage,
     datePublished: blog.published_at || blog.created_at,
     dateModified: blog.updated_at || blog.published_at || blog.created_at,
@@ -352,7 +506,7 @@ const BlogDetails = () => {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${seoConfig.siteUrl}/blog/${slug}`,
+      '@id': blog.canonical_url || `${seoConfig.siteUrl}/blog/${slug}`,
     },
   } : null;
 
@@ -361,15 +515,45 @@ const BlogDetails = () => {
     ...(blog ? [{ name: blog.title, path: `/blog/${slug}` }] : []),
   ]);
 
+  // Generate ToC
+  const generateToC = (html) => {
+    if (!html) return [];
+    const toc = [];
+    const regex = /<h([2-6])[^>]*>(.*?)<\/h\1>/gi;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      const level = parseInt(match[1]);
+      const title = match[2].replace(/<[^>]+>/g, '').trim(); // strip inner HTML like <strong>
+      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      toc.push({ level, title, id });
+    }
+    return toc;
+  };
+  
+  const tocItems = blog?.show_toc ? generateToC(blog.content) : [];
+  
+  // Inject IDs into HTML content for ToC linking
+  const injectHeadingIds = (html) => {
+    if (!html || !blog?.show_toc) return html;
+    return html.replace(/<h([2-6])([^>]*)>(.*?)<\/h\1>/gi, (match, level, attrs, innerHtml) => {
+       const titleText = innerHtml.replace(/<[^>]+>/g, '').trim();
+       const id = titleText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+       // If it already has an ID, keep it, otherwise add one
+       if (attrs.includes('id=')) return match;
+       return `<h${level}${attrs} id="${id}">${innerHtml}</h${level}>`;
+    });
+  };
+
   return (
     <div className="bg-white min-h-screen font-sans">
       {blog && (
         <SEO
-          title={`${blog.title} - AiGENThix Blog`}
-          description={blog.excerpt || blog.content?.substring(0, 160)}
+          title={blog.meta_title || `${blog.title} - AiGENThix Blog`}
+          description={blog.meta_description || blog.excerpt || blog.content?.substring(0, 160)}
           keywords={blog.tags?.join(', ') || blog.category || 'AI, technology, AiGENThix'}
           image={blog.featured_image_url}
           type="article"
+          url={blog.canonical_url || `${seoConfig.siteUrl}/blog/${slug}`}
           article={{
             publishedTime: blog.published_at || blog.created_at,
             author: blog.author_name || 'AiGENThix',
@@ -433,7 +617,38 @@ const BlogDetails = () => {
 
                 {/* Author and Fact-Checker Row */}
                 <div className="flex flex-wrap items-start gap-10 mt-2">
-                  {blog.author_name && (
+                  {blog.authors_data && blog.authors_data.length > 0 ? (
+                    blog.authors_data.map((author, idx) => (
+                      <div key={idx} className="relative group flex items-center space-x-4 cursor-pointer">
+                        {author.avatar_url ? (
+                          <img src={author.avatar_url} alt={author.name} className="w-12 h-12 rounded-full object-cover shadow-sm" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                            <User className="h-6 w-6 text-gray-500" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{author.role === 'contributor' ? 'Contributor' : (idx === 0 ? 'Author' : 'Contributor')}</div>
+                          <div className="font-bold text-gray-900 text-[15px] hover:text-blue-600 transition-colors">{author.name}</div>
+                          <div className="flex items-center gap-3 mt-1">
+                            {author.twitter && <a href={author.twitter} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#1DA1F2] transition-colors"><FaTwitter className="w-[14px] h-[14px]" /></a>}
+                            {author.linkedin && <a href={author.linkedin} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#0A66C2] transition-colors"><FaLinkedin className="w-[14px] h-[14px]" /></a>}
+                            {author.facebook && <a href={author.facebook} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#1877F2] transition-colors"><FaFacebook className="w-[14px] h-[14px]" /></a>}
+                            {author.instagram && <a href={author.instagram} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#E4405F] transition-colors"><FaInstagram className="w-[14px] h-[14px]" /></a>}
+                          </div>
+                        </div>
+                        
+                        {/* Tooltip */}
+                        {author.bio && (
+                          <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                            <div className="font-semibold mb-1 text-base">{author.name}</div>
+                            <p className="text-gray-300 leading-relaxed text-[13px]">{author.bio}</p>
+                            <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : blog.author_name && (
                     <div className="relative group flex items-center space-x-4 cursor-pointer">
                       {blog.author_avatar_url ? (
                         <img src={blog.author_avatar_url} alt={blog.author_name} className="w-12 h-12 rounded-full object-cover shadow-sm" />
@@ -443,8 +658,8 @@ const BlogDetails = () => {
                         </div>
                       )}
                       <div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold">By</div>
-                        <div className="font-bold text-gray-900 text-[15px] hover:text-blue-600 transition-colors">{blog.author_name}</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Author</div>
+                        <div className="font-bold text-gray-900 text-[15px] hover:text-blue-600 transition-colors">{blog.author_name || 'Admin'}</div>
                         <div className="flex items-center gap-3 mt-1">
                           {blog.author_twitter && <a href={blog.author_twitter} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#1DA1F2] transition-colors"><FaTwitter className="w-[14px] h-[14px]" /></a>}
                           {blog.author_linkedin && <a href={blog.author_linkedin} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-[#0A66C2] transition-colors"><FaLinkedin className="w-[14px] h-[14px]" /></a>}
@@ -464,7 +679,37 @@ const BlogDetails = () => {
                     </div>
                   )}
 
-                  {blog.fact_checker_name && (
+                  {blog.fact_checkers_data && blog.fact_checkers_data.length > 0 ? (
+                    blog.fact_checkers_data.map((fc, idx) => (
+                      <div key={`fc-${idx}`} className="relative group flex items-center space-x-4 cursor-pointer">
+                        {fc.avatar_url ? (
+                          <img src={fc.avatar_url} alt={fc.name} className="w-12 h-12 rounded-full object-cover shadow-sm border-2 border-blue-50 p-0.5" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center border-2 border-blue-100">
+                            <Check className="h-6 w-6 text-blue-500" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-xs text-blue-600 flex items-center gap-1 font-semibold uppercase tracking-wider">
+                            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                              <Check className="w-2.5 h-2.5" />
+                            </div>
+                            Fact-Checked by
+                          </div>
+                          <div className="font-bold text-gray-900 text-[15px] hover:text-blue-600 transition-colors">{fc.name}</div>
+                        </div>
+                        
+                        {/* Tooltip */}
+                        {fc.bio && (
+                          <div className="absolute top-full left-0 mt-3 hidden group-hover:block w-72 p-4 bg-gray-900 text-white text-sm rounded-xl z-20 shadow-2xl transition-all">
+                            <div className="font-semibold mb-1 text-base">{fc.name}</div>
+                            <p className="text-gray-300 leading-relaxed text-[13px]">{fc.bio}</p>
+                            <div className="absolute bottom-full left-6 -mb-1 border-8 border-transparent border-b-gray-900"></div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : blog.fact_checker_name && (
                     <div className="relative group flex items-center space-x-4 cursor-pointer">
                       {blog.fact_checker_avatar_url ? (
                         <img src={blog.fact_checker_avatar_url} alt={blog.fact_checker_name} className="w-12 h-12 rounded-full object-cover shadow-sm border-2 border-blue-50 p-0.5" />
@@ -530,9 +775,25 @@ const BlogDetails = () => {
               {/* CTA TOP */}
               {renderCTA('top')}
 
+              {/* TABLE OF CONTENTS */}
+              {blog.show_toc && tocItems.length > 0 && (
+                <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Table of Contents</h3>
+                  <ul className="space-y-2">
+                    {tocItems.map((item, idx) => (
+                      <li key={idx} style={{ marginLeft: `${(item.level - 2) * 1}rem` }}>
+                        <a href={`#${item.id}`} className="text-blue-600 hover:underline hover:text-blue-800 transition-colors">
+                          {item.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* BLOG CONTENT */}
               <div className="blog-content prose prose-lg max-w-none text-gray-800">
-                {renderContent(blog.content)}
+                {renderContent(injectHeadingIds(blog.content))}
               </div>
 
               {/* CTA BOTTOM */}
@@ -565,8 +826,93 @@ const BlogDetails = () => {
                 </div>
               )}
 
+              {/* FAQs SECTION */}
+              {blog.faqs && blog.faqs.length > 0 && (
+                <div className="mt-16">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    Frequently Asked Questions
+                  </h3>
+                  <div className="space-y-4">
+                    {blog.faqs.map((faq, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-2xl overflow-hidden bg-white hover:border-blue-200 transition-colors">
+                        <button
+                          onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+                          className="w-full text-left px-6 py-4 flex items-center justify-between gap-4 focus:outline-none"
+                        >
+                          <span className="font-semibold text-gray-900 pr-8">{faq.question}</span>
+                          <ChevronDown className={`w-5 h-5 text-blue-600 transition-transform duration-300 flex-shrink-0 ${openFaqIndex === idx ? 'rotate-180' : ''}`} />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ${openFaqIndex === idx ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                          <div className="px-6 pb-5 pt-1 text-gray-600 leading-relaxed text-[15px]">
+                            {faq.answer}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* AUTHOR DETAILS SECTION (BOTTOM) */}
-              {blog.author_name && (
+              {blog.authors_data && blog.authors_data.length > 0 ? (
+                <div className="mt-16 space-y-12">
+                  {(() => {
+                    const mainAuthors = [];
+                    const contributors = [];
+                    blog.authors_data.forEach((author, idx) => {
+                      if (author.role === 'contributor' || (idx > 0 && !author.role)) {
+                        contributors.push(author);
+                      } else {
+                        mainAuthors.push(author);
+                      }
+                    });
+
+                    const renderAuthorCard = (author, idx) => (
+                      <div key={idx} className="p-8 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col md:flex-row items-center md:items-start gap-6">
+                        {author.avatar_url ? (
+                          <img src={author.avatar_url} alt={author.name} className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-white flex-shrink-0" />
+                        ) : (
+                          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center shadow-md border-4 border-white flex-shrink-0">
+                            <User className="h-10 w-10 text-gray-500" />
+                          </div>
+                        )}
+                        <div className="flex-1 text-center md:text-left">
+                          <h3 className="text-2xl font-bold text-gray-900 mb-1">{author.name}</h3>
+                          {author.title && (
+                            <p className="text-blue-600 font-medium mb-3">{author.title}</p>
+                          )}
+                          {author.bio && (
+                            <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base">{author.bio}</p>
+                          )}
+                          <div className="flex items-center justify-center md:justify-start gap-4">
+                            {author.twitter && <a href={author.twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1DA1F2] hover:border-[#1DA1F2] transition-colors"><FaTwitter className="w-4 h-4" /></a>}
+                            {author.linkedin && <a href={author.linkedin} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#0A66C2] hover:border-[#0A66C2] transition-colors"><FaLinkedin className="w-4 h-4" /></a>}
+                            {author.facebook && <a href={author.facebook} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#1877F2] hover:border-[#1877F2] transition-colors"><FaFacebook className="w-4 h-4" /></a>}
+                            {author.instagram && <a href={author.instagram} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#E4405F] hover:border-[#E4405F] transition-colors"><FaInstagram className="w-4 h-4" /></a>}
+                            {author.github && <a href={author.github} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:border-gray-900 transition-colors"><FaGithub className="w-4 h-4" /></a>}
+                            {author.website && <a href={author.website} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-blue-500 hover:border-blue-500 transition-colors"><FaGlobe className="w-4 h-4" /></a>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+
+                    return (
+                      <>
+                        {mainAuthors.length > 0 && (
+                          <div className="flex flex-col gap-6">
+                            <h3 className="text-2xl font-bold text-gray-900 border-b border-gray-100 pb-2">
+                              {mainAuthors.length > 1 ? 'About the Authors' : 'About the Author'}
+                            </h3>
+                            <div className="flex flex-col gap-6">
+                              {mainAuthors.map(renderAuthorCard)}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              ) : blog.author_name && (
                 <div className="mt-16">
                   <h3 className="text-2xl font-bold text-gray-900 mb-6">About Author</h3>
                   <div className="p-8 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -598,33 +944,6 @@ const BlogDetails = () => {
                 </div>
               )}
 
-              {/* FAQs SECTION */}
-              {blog.faqs && blog.faqs.length > 0 && (
-                <div className="mt-16">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    Frequently Asked Questions
-                  </h3>
-                  <div className="space-y-4">
-                    {blog.faqs.map((faq, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-2xl overflow-hidden bg-white hover:border-blue-200 transition-colors">
-                        <button
-                          onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                          className="w-full text-left px-6 py-4 flex items-center justify-between gap-4 focus:outline-none"
-                        >
-                          <span className="font-semibold text-gray-900 pr-8">{faq.question}</span>
-                          <ChevronDown className={`w-5 h-5 text-blue-600 transition-transform duration-300 flex-shrink-0 ${openFaqIndex === idx ? 'rotate-180' : ''}`} />
-                        </button>
-                        <div className={`overflow-hidden transition-all duration-300 ${openFaqIndex === idx ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                          <div className="px-6 pb-5 pt-1 text-gray-600 leading-relaxed text-[15px]">
-                            {faq.answer}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
             </motion.article>
 
             {/* ALL TOPICS (BOTTOM) */}
@@ -641,7 +960,11 @@ const BlogDetails = () => {
           </div>
 
           {/* SIDEBAR - RIGHT SIDE (30%) */}
-          <div className="w-full lg:w-[30%] space-y-8 lg:pl-4 lg:sticky lg:top-32 lg:self-start">
+          <div 
+            ref={sidebarRef}
+            className="w-full lg:w-[30%] space-y-8 lg:pl-4 lg:sticky lg:self-start transition-all duration-300"
+            style={{ top: `${sidebarTop}px` }}
+          >
             
             {/* CTA CARD */}
             <div className="bg-[#002B5B] text-white p-8 rounded-2xl shadow-lg text-center">
@@ -654,46 +977,37 @@ const BlogDetails = () => {
               </Link>
             </div>
 
+            {/* DYNAMIC ADVERTISEMENT CARD */}
+            {renderAdvertisement()}
+
             {/* RECENT POSTS */}
             {relatedBlogs.length > 0 && (
               <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
                 <h3 className="font-bold text-lg text-gray-900 mb-4 pb-3 border-b border-gray-100">Recent Posts</h3>
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {relatedBlogs.map((post) => (
                     <Link
                       key={`recent-${post.id}`}
                       to={`/blog/${post.slug}`}
-                      className="block group"
+                      className="flex gap-4 group items-start"
                     >
-                      <h4 className="text-[15px] font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
-                        {post.title}
-                      </h4>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatDate(post.published_at || post.created_at)}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* RELATED POSTS (Can be different list or same context) */}
-            {relatedBlogs.length > 0 && (
-              <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                <h3 className="font-bold text-lg text-gray-900 mb-4 pb-3 border-b border-gray-100">Related Posts</h3>
-                <div className="space-y-4">
-                  {relatedBlogs.map((post) => (
-                    <Link
-                      key={`related-${post.id}`}
-                      to={`/blog/${post.slug}`}
-                      className="block group"
-                    >
-                      <h4 className="text-[15px] font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
-                        {post.title}
-                      </h4>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatDate(post.published_at || post.created_at)}
-                      </p>
+                      {post.featured_image_url && (
+                        <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-gray-100 shadow-sm bg-gray-50">
+                          <img 
+                            src={post.featured_image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <h4 className="text-[14px] font-bold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                          {post.title}
+                        </h4>
+                        <p className="text-[11px] text-gray-500 mt-2 font-semibold uppercase tracking-wide">
+                          {formatDate(post.published_at || post.created_at)}
+                        </p>
+                      </div>
                     </Link>
                   ))}
                 </div>

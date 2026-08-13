@@ -22,6 +22,17 @@ const APIIntegrationService = () => {
                 description="Seamlessly connect applications, platforms, and services with secure, scalable, and high-performance API integrations that power automation and digital growth."
                 url="/services/api-integration"
                 image="/api-integration-og.jpg"
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "API Integration Services",
+                    "description": "Seamlessly connect applications, platforms, and services with secure, scalable, and high-performance API integrations that power automation and digital growth.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "API Integration Services"
+                }}
             />
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
                 <Navbar />

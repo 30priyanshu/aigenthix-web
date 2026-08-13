@@ -48,6 +48,17 @@ const GenerativeAIService = () => {
                 description="Unlock the next level of innovation with generative AI. From intelligent content creation to workflow automation, we help businesses stay ahead with AI-driven solutions."
                 url="/services/generative-ai"
                 image="/generative-ai-og.jpg"
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Generative AI Solutions for Your Business Services",
+                    "description": "Unlock the next level of innovation with generative AI. From intelligent content creation to workflow automation, we help businesses stay ahead with AI-driven solutions.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Generative AI Solutions for Your Business Services"
+                }}
             />
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">
                 <Navbar />

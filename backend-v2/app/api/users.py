@@ -73,6 +73,7 @@ def create_user(
 import secrets
 from app.schemas.auth import UserSendAccessRequest
 from app.services.email_service import email_service
+from app.repositories.activity_log_repository import ActivityLogRepository
 
 @router.post("/send-access", response_model=SuccessResponse[dict])
 def send_access(
@@ -113,6 +114,18 @@ def send_access(
         role=request.role,
         temp_password=temp_password
     )
+    
+    # Log the activity
+    activity_repo = ActivityLogRepository(cursor)
+    activity_repo.log_activity(
+        user_id=int(current_user.get("sub")) if current_user.get("sub") else None,
+        user_name=current_user.get("name") or current_user.get("email", "Unknown"),
+        action="granted_access_to",
+        entity_type="user",
+        entity_id=user_id,
+        entity_title=request.name or request.email
+    )
+    cursor.connection.commit()
     
     msg = "Access granted and email sent successfully" if email_sent else "User created, but failed to send email. Check logs."
     return SuccessResponse(data={"id": user_id}, message=msg)

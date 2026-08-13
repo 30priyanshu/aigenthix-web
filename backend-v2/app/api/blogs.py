@@ -23,6 +23,17 @@ def get_blog_page_data(blog_service: BlogService = Depends(get_blog_service)):
     return SuccessResponse(data=data)
 
 
+@router.get("/check-slug", response_model=SuccessResponse[bool])
+def check_slug(slug: str, blog_service: BlogService = Depends(get_blog_service)):
+    """
+    Check if a slug is available. Returns true if available (not duplicate).
+    """
+    try:
+        existing = blog_service.get_blog_by_slug(slug, preview=True)
+        return SuccessResponse(data=False) # Not available
+    except Exception:
+        return SuccessResponse(data=True) # Available
+
 @router.get("/{slug}", response_model=SuccessResponse[BlogPublic])
 def get_blog_by_slug(slug: str, preview: bool = False, blog_service: BlogService = Depends(get_blog_service)):
     """

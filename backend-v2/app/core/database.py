@@ -61,8 +61,8 @@ class Database:
             db_config = self._parse_database_url()
             
             self._pool = pool.ThreadedConnectionPool(
-                minconn=1,
-                maxconn=5,
+                minconn=5,
+                maxconn=50,
                 **db_config
             )
             logger.info(

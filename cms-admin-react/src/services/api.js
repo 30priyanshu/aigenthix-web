@@ -156,8 +156,12 @@ export const BlogsApi = {
 
         const data = await response.json();
         return data.url;
-    }
+    },
+    checkSlug: (slug) => Api.get(`/api/blogs/check-slug?slug=${encodeURIComponent(slug)}`, false)
 };
+
+export const AuthorsApi = createGenericApi('/api/admin/authors');
+export const FactCheckersApi = createGenericApi('/api/admin/factcheckers');
 
 export const ProductsApi = createGenericApi('/cms/products');
 export const ServicesApi = createGenericApi('/cms/services');

@@ -21,6 +21,17 @@ const Web3Service = () => {
                 description="Empowering the future with secure, scalable, and innovative Web3 solutions. From decentralized apps to smart contracts, we build the digital backbone of the new internet."
                 url="/services/web3"
                 image="/web3-development-og.jpg"
+            structuredData={{
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    "name": "Web3 Development Services",
+                    "description": "Empowering the future with secure, scalable, and innovative Web3 solutions. From decentralized apps to smart contracts, we build the digital backbone of the new internet.",
+                    "provider": {{
+                        "@type": "Organization",
+                        "name": "AiGENThix"
+                    }},
+                    "serviceType": "Web3 Development Services"
+                }}
             />
 
             <div className="font-inter bg-gradient-to-b from-white to-[#f8faff] text-gray-800">

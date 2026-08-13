@@ -27,6 +27,9 @@ class BlogService:
             category=blog.get("category"),
             tags=blog.get("tags", []),
             featured_image_url=blog.get("featured_image_url"),
+            author_id=blog.get("author_id"),
+            author_ids=blog.get("author_ids", []),
+            authors_data=blog.get("authors_data", []),
             author_name=blog.get("author_name"),
             author_title=blog.get("author_title"),
             author_bio=blog.get("author_bio"),
@@ -40,6 +43,8 @@ class BlogService:
             fact_checker_name=blog.get("fact_checker_name"),
             fact_checker_bio=blog.get("fact_checker_bio"),
             fact_checker_avatar_url=blog.get("fact_checker_avatar_url"),
+            fact_checker_ids=blog.get("fact_checker_ids", []),
+            fact_checkers_data=blog.get("fact_checkers_data", []),
             faqs=blog.get("faqs", []),
             meta_title=blog.get("meta_title"),
             meta_description=blog.get("meta_description"),
@@ -48,6 +53,7 @@ class BlogService:
             cta_url=blog.get("cta_url"),
             cta_style=blog.get("cta_style"),
             cta_position=blog.get("cta_position"),
+            ad_category=blog.get("ad_category"),
             read_time=blog.get("read_time", 0),
             published=blog.get("published", False),
             is_featured=blog.get("is_featured", False),
@@ -65,7 +71,11 @@ class BlogService:
             category=blog.get("category"),
             tags=blog.get("tags", []),
             featured_image_url=blog.get("featured_image_url"),
+            authors_data=blog.get("authors_data", []),
             author_name=blog.get("author_name"),
+            fact_checker_ids=blog.get("fact_checker_ids", []),
+            fact_checkers_data=blog.get("fact_checkers_data", []),
+            ad_category=blog.get("ad_category"),
             read_time=blog.get("read_time", 0),
             published=blog.get("published", False),
             is_featured=blog.get("is_featured", False),
@@ -163,6 +173,19 @@ class BlogService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Blog not found"
             )
+        
+        # Check if slug changed
+        old_slug = existing.get("slug")
+        new_slug = blog_data.slug
+        if old_slug and new_slug and old_slug != new_slug:
+            try:
+                # Add redirect
+                self.blog_repo.cursor.execute(
+                    "INSERT INTO redirects (old_slug, new_slug) VALUES (%s, %s) ON CONFLICT (old_slug) DO UPDATE SET new_slug = EXCLUDED.new_slug",
+                    (old_slug, new_slug)
+                )
+            except Exception as e:
+                logger.error(f"Failed to create redirect for {old_slug} -> {new_slug}: {e}")
         
         success = self.blog_repo.update(blog_id, blog_data)
         if not success:
