@@ -45,10 +45,10 @@ const HumanoidSystems = () => {
                     "@type": "Service",
                     "name": "Humanoid Systems & Robotics Services",
                     "description": "Build next-generation humanoid systems with advanced AI, robotics engineering, and real-world adaptability for modern industries.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Humanoid Systems & Robotics Services"
                 }}
             />

@@ -49,11 +49,7 @@ services:
     autoDeploy: true
 
   # ============================================
-<<<<<<< HEAD
-  # CMS Admin (Static HTML/CSS/JS) ---
-=======
-  # CMS Admin (Static HTML/CSS/JS) ---->
->>>>>>> origin/main
+  # CMS Admin (Static HTML/CSS/JS)
   # ============================================
   - type: web
     name: aigenthix-cms

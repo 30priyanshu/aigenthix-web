@@ -960,17 +960,7 @@ const BlogDetails = () => {
           </div>
 
           {/* SIDEBAR - RIGHT SIDE (30%) */}
-<<<<<<< HEAD
-          <div 
-            ref={sidebarRef}
-            className="w-full lg:w-[30%] space-y-8 lg:pl-4 lg:sticky lg:self-start transition-all duration-300"
-            style={{ top: `${sidebarTop}px` }}
-          >
-            
-=======
           <div className="w-full lg:w-[30%] space-y-8 lg:pl-4 lg:sticky lg:top-32 lg:self-start">
-
->>>>>>> origin/main
             {/* CTA CARD */}
             <div className="bg-[#002B5B] text-white p-8 rounded-2xl shadow-lg text-center">
               <h3 className="text-2xl font-bold mb-3">Empower Your Business with AI</h3>

@@ -29,10 +29,10 @@ const DataEngineeringService = () => {
                     "@type": "Service",
                     "name": "Data Engineering Services ",
                     "description": "Build scalable, reliable, and high-performance data platforms. We transform raw data into trusted insights that drive AI, automation, and business growth.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Data Engineering Services "
                 }}
             />

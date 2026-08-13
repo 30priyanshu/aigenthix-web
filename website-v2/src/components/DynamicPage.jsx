@@ -256,16 +256,11 @@ const DynamicPage = ({ type }) => {
         if (type === 'industries') items = await cmsService.getIndustries();
         if (type === 'rd') items = await cmsService.getRDs();
 
-<<<<<<< HEAD
-        const match = items.find(i => i.slug === slug);
-        const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
-        if (match && (match.status === 'published' || match.is_published || isPreview)) {
-=======
         const decodedSlug = decodeURIComponent(slug);
-        const match = items.find(i => (i.slug === slug || i.slug === decodedSlug) && (i.status === 'published' || i.is_published));
+        const match = items.find(i => i.slug === slug || i.slug === decodedSlug);
+        const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
         
-        if (match) {
->>>>>>> origin/main
+        if (match && (match.status === 'published' || match.is_published || isPreview)) {
           if (typeof match.content_data === 'string') {
              try { match.content_data = JSON.parse(match.content_data); } catch(e) {}
           }

@@ -69,10 +69,10 @@ const BlockchainService = () => {
                     "@type": "Service",
                     "name": "Blockchain Technology for the Future Services",
                     "description": "Unlock secure, transparent, and decentralized innovation with blockchain technology. From smart contracts to enterprise solutions, we help businesses lead the digital revolution.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Blockchain Technology for the Future Services"
                 }}
             />

@@ -27,10 +27,10 @@ const SoftwareDevelopmentService = () => {
                     "@type": "Service",
                     "name": "Software Development Services",
                     "description": "Learn about AiGenthix — our mission, vision, AI research, ethical approach, and how we help businesses grow using cutting-edge artificial intelligence.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Software Development Services"
                 }}
             />

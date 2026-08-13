@@ -27,10 +27,10 @@ const APIIntegrationService = () => {
                     "@type": "Service",
                     "name": "API Integration Services",
                     "description": "Seamlessly connect applications, platforms, and services with secure, scalable, and high-performance API integrations that power automation and digital growth.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "API Integration Services"
                 }}
             />

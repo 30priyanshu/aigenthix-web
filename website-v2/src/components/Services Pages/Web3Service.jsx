@@ -26,10 +26,10 @@ const Web3Service = () => {
                     "@type": "Service",
                     "name": "Web3 Development Services",
                     "description": "Empowering the future with secure, scalable, and innovative Web3 solutions. From decentralized apps to smart contracts, we build the digital backbone of the new internet.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Web3 Development Services"
                 }}
             />

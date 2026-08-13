@@ -56,10 +56,10 @@ const RoboticsService = () => {
                     "@type": "Service",
                     "name": "Robotics Solutions for Smart Automation Services",
                     "description": "Transform industries with intelligent robotics systems. From automation to autonomous machines, we engineer the future of robotics.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Robotics Solutions for Smart Automation Services"
                 }}
             />

@@ -27,10 +27,10 @@ const IoTService = () => {
                     "@type": "Service",
                     "name": "Internet of Things (IoT) Solutions",
                     "description": "Connect devices, data, and intelligence at scale. We build secure, real-time IoT ecosystems that enable smarter operations, automation, and predictive insights.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Internet of Things (IoT) Solutions"
                 }}
             />

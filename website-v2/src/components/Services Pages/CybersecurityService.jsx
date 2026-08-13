@@ -57,10 +57,10 @@ const CybersecurityService = () => {
                     "@type": "Service",
                     "name": "Cybersecurity Services",
                     "description": "Protect your business with advanced cybersecurity systems. From threat detection to enterprise compliance, we secure your digital future.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Cybersecurity Services"
                 }}
             />

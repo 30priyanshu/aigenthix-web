@@ -53,10 +53,10 @@ const GenerativeAIService = () => {
                     "@type": "Service",
                     "name": "Generative AI Solutions for Your Business Services",
                     "description": "Unlock the next level of innovation with generative AI. From intelligent content creation to workflow automation, we help businesses stay ahead with AI-driven solutions.",
-                    "provider": {{
+                    "provider": {
                         "@type": "Organization",
                         "name": "AiGENThix"
-                    }},
+                    },
                     "serviceType": "Generative AI Solutions for Your Business Services"
                 }}
             />
